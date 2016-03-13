@@ -32,6 +32,7 @@ Datum pcpoint_as_text(PG_FUNCTION_ARGS);
 Datum pcpatch_as_text(PG_FUNCTION_ARGS);
 Datum pcpoint_as_bytea(PG_FUNCTION_ARGS);
 Datum pcpatch_envelope_as_bytea(PG_FUNCTION_ARGS);
+Datum pcpatch_box3d(PG_FUNCTION_ARGS);
 
 
 static void
@@ -303,7 +304,7 @@ Datum pcpatch_envelope_as_bytea(PG_FUNCTION_ARGS)
 	SERIALIZED_PATCH *serpatch = PG_GETHEADER_SERPATCH_P(0);
 	PCSCHEMA *schema = pc_schema_from_pcid(serpatch->pcid, fcinfo);
 
-	bytes = pc_bounds_to_wkb(&serpatch->bounds, schema->srid, &bytes_size);
+	bytes = pc_bounds_to_geometry_wkb(&serpatch->bounds, schema->srid, &bytes_size);
 	wkb_size = VARHDRSZ + bytes_size;
 	wkb = palloc(wkb_size);
 	memcpy(VARDATA(wkb), bytes, bytes_size);
@@ -313,6 +314,16 @@ Datum pcpatch_envelope_as_bytea(PG_FUNCTION_ARGS)
 
 	PG_RETURN_BYTEA_P(wkb);
 }
+
+PG_FUNCTION_INFO_V1(pcpatch_box3d);
+Datum pcpatch_box3d(PG_FUNCTION_ARGS)
+{
+	SERIALIZED_PATCH *serpatch = PG_GETHEADER_SERPATCH_P(0);
+	PCSCHEMA *schema = pc_schema_from_pcid(serpatch->pcid, fcinfo);
+	PCBOX3D *box = pc_bounds_to_box3d(&serpatch->bounds, schema->srid);
+	PG_RETURN_POINTER(box);
+}
+
 
 PG_FUNCTION_INFO_V1(pc_typmod_in);
 Datum pc_typmod_in(PG_FUNCTION_ARGS)

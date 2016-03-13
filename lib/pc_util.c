@@ -241,7 +241,11 @@ pc_bounds_intersects(const PCBOUNDS *b1, const PCBOUNDS *b2)
 	if ( b1->xmin > b2->xmax ||
 	        b1->xmax < b2->xmin ||
 	        b1->ymin > b2->ymax ||
-	        b1->ymax < b2->ymin )
+	        b1->ymax < b2->ymin ||
+	        b1->zmin > b2->zmax ||
+	        b1->zmax < b2->zmin ||
+	        b1->mmin > b2->mmax ||
+	        b1->mmax < b2->mmin )
 	{
 		return PC_FALSE;
 	}
@@ -251,16 +255,20 @@ pc_bounds_intersects(const PCBOUNDS *b1, const PCBOUNDS *b2)
 void
 pc_bounds_init(PCBOUNDS *b)
 {
-	b->xmin = b->ymin = DBL_MAX;
-	b->xmax = b->ymax = -1*DBL_MAX;
+	b->xmin = b->ymin = b->zmin = b->mmin = DBL_MAX;
+	b->xmax = b->ymax = b->zmax = b->mmax = -1*DBL_MAX;
 }
 
 void pc_bounds_merge(PCBOUNDS *b1, const PCBOUNDS *b2)
 {
 	if ( b2->xmin < b1->xmin ) b1->xmin = b2->xmin;
 	if ( b2->ymin < b1->ymin ) b1->ymin = b2->ymin;
+	if ( b2->zmin < b1->zmin ) b1->zmin = b2->zmin;
+	if ( b2->mmin < b1->mmin ) b1->mmin = b2->mmin;
 	if ( b2->xmax > b1->xmax ) b1->xmax = b2->xmax;
 	if ( b2->ymax > b1->ymax ) b1->ymax = b2->ymax;
+	if ( b2->zmax > b1->zmax ) b1->zmax = b2->zmax;
+	if ( b2->mmax > b1->mmax ) b1->mmax = b2->mmax;
 }
 
 
@@ -289,7 +297,7 @@ wkb_set_char(uint8_t *wkb, char c)
 }
 
 uint8_t *
-pc_bounds_to_wkb(const PCBOUNDS *bounds, uint32_t srid, size_t *wkbsize)
+pc_bounds_to_geometry_wkb(const PCBOUNDS *bounds, uint32_t srid, size_t *wkbsize)
 {
     /* Bounds! */
     double xmin = bounds->xmin;
@@ -361,4 +369,18 @@ pc_bounds_to_wkb(const PCBOUNDS *bounds, uint32_t srid, size_t *wkbsize)
     }
     
     return wkb;
+}
+
+PCBOX3D *
+pc_bounds_to_box3d(const PCBOUNDS *bounds, uint32_t srid)
+{
+	PCBOX3D *box = (PCBOX3D *) pcalloc(sizeof(PCBOX3D));
+	box->xmin = bounds->xmin;
+	box->ymin = bounds->ymin;
+	box->zmin = bounds->zmin;
+	box->xmax = bounds->xmax;
+	box->ymax = bounds->ymax;
+	box->zmax = bounds->zmax;
+	box->srid = srid;
+    return box;
 }

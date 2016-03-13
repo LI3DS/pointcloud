@@ -177,6 +177,18 @@ pc_patch_dimensional_filter(const PCPATCH_DIMENSIONAL *pdl, const PCBITMAP *map)
             fpdl->bounds.ymax = stats.max;
         }
 
+		else if ( i == pdl->schema->z_position )
+		{
+            fpdl->bounds.zmin = stats.min;
+            fpdl->bounds.zmax = stats.max;
+        }
+
+		else if ( i == pdl->schema->m_position )
+		{
+            fpdl->bounds.mmin = stats.min;
+            fpdl->bounds.mmax = stats.max;
+        }
+
         pc_point_set_double_by_index(&(fpdl->stats->min), i, stats.min);
         pc_point_set_double_by_index(&(fpdl->stats->max), i, stats.max);
         pc_point_set_double_by_index(&(fpdl->stats->avg), i, stats.sum/fpdl->npoints);

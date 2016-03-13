@@ -191,7 +191,7 @@ pc_patch_uncompressed_compute_extent(PCPATCH_UNCOMPRESSED *patch)
 	int i;
 	PCPOINT *pt = pc_point_from_data(patch->schema, patch->data);
 	PCBOUNDS b;
-	double x, y;
+	double v;
 
 	/* Calculate bounds */
 	pc_bounds_init(&b);
@@ -199,12 +199,26 @@ pc_patch_uncompressed_compute_extent(PCPATCH_UNCOMPRESSED *patch)
 	{
 		/* Just push the data buffer forward by one point at a time */
 		pt->data = patch->data + i * patch->schema->size;
-		x = pc_point_get_x(pt);
-		y = pc_point_get_y(pt);
-		if ( b.xmin > x ) b.xmin = x;
-		if ( b.ymin > y ) b.ymin = y;
-		if ( b.xmax < x ) b.xmax = x;
-		if ( b.ymax < y ) b.ymax = y;
+		if ( patch->schema->x_position > -1 ) {
+            v = pc_point_get_x(pt);
+            if ( b.xmin > v ) b.xmin = v;
+    		if ( b.xmax < v ) b.xmax = v;
+        }
+		if ( patch->schema->y_position > -1 ) {
+            v = pc_point_get_y(pt);
+            if ( b.ymin > v ) b.ymin = v;
+    		if ( b.ymax < v ) b.ymax = v;
+        }
+		if ( patch->schema->z_position > -1 ) {
+            v = pc_point_get_z(pt);
+            if ( b.zmin > v ) b.zmin = v;
+    		if ( b.zmax < v ) b.zmax = v;
+        }
+		if ( patch->schema->m_position > -1 ) {
+            v = pc_point_get_m(pt);
+            if ( b.mmin > v ) b.mmin = v;
+    		if ( b.mmax < v ) b.mmax = v;
+        }
 	}
 
 	patch->bounds = b;

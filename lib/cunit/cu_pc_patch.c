@@ -493,7 +493,7 @@ test_patch_wkb()
     CU_ASSERT_EQUAL(pu1->npoints, pu2->npoints);
     CU_ASSERT(memcmp(pu1->data, pu2->data, pu1->datasize) == 0);
 
-    wkb3 = pc_bounds_to_wkb(&pa1->bounds,simpleschema->srid,&z3);
+    wkb3 = pc_bounds_to_geometry_wkb(&pa1->bounds,simpleschema->srid,&z3);
     hexwkb = hexbytes_from_bytes(wkb3,z3);
     if ( machine_endian() == PC_NDR )
     {

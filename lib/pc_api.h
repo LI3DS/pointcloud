@@ -90,6 +90,8 @@ typedef struct
 	uint32_t srid;        /* Foreign key reference to SPATIAL_REF_SYS */
 	int32_t x_position;  /* What entry is the x coordinate at? */
 	int32_t y_position;  /* What entry is the y coordinate at? */
+	int32_t z_position;  /* What entry is the z coordinate at? */
+	int32_t m_position;  /* What entry is the m coordinate at? */
 	uint32_t compression; /* Compression type applied to the data */
 	hashtable *namehash;  /* Look-up from dimension name to pointer */
 } PCSCHEMA;
@@ -148,7 +150,18 @@ typedef struct
 	double xmax;
 	double ymin;
 	double ymax;
+	double zmin;
+	double zmax;
+	double mmin;
+	double mmax;
 } PCBOUNDS;
+
+typedef struct
+{
+	double xmin, ymin, zmin;
+	double xmax, ymax, zmax;
+	int32_t srid;
+} PCBOX3D;
 
 /* Used for generic patch statistics */
 typedef struct
@@ -281,8 +294,6 @@ uint32_t pc_schema_is_valid(const PCSCHEMA *s);
 PCSCHEMA* pc_schema_clone(const PCSCHEMA *s);
 /** Add/overwrite a dimension in a schema */
 void pc_schema_set_dimension(PCSCHEMA *s, PCDIMENSION *d);
-/** Check/set the x/y position in the dimension list */
-void pc_schema_check_xy(PCSCHEMA *s);
 /** Get the width in bytes of a single point in the schema */
 size_t pc_schema_get_size(const PCSCHEMA *s);
 
@@ -342,11 +353,23 @@ double pc_point_get_x(const PCPOINT *pt);
 /** Returns Y coordinate */
 double pc_point_get_y(const PCPOINT *pt);
 
+/** Returns Z coordinate */
+double pc_point_get_z(const PCPOINT *pt);
+
+/** Returns M coordinate */
+double pc_point_get_m(const PCPOINT *pt);
+
 /** Set the X coordinate */
 double pc_point_set_x(PCPOINT *pt, double val);
 
 /** Set the Y coordinate */
 double pc_point_set_y(PCPOINT *pt, double val);
+
+/** Set the Z coordinate */
+double pc_point_set_z(PCPOINT *pt, double val);
+
+/** Set the M coordinate */
+double pc_point_set_m(PCPOINT *pt, double val);
 
 /** Create a new readwrite PCPOINT from a hex byte array */
 PCPOINT* pc_point_from_wkb(const PCSCHEMA *s, uint8_t *wkb, size_t wkbsize);
@@ -421,8 +444,11 @@ int pc_patch_compute_extent(PCPATCH *patch);
 /** True/false if bounds intersect */
 int pc_bounds_intersects(const PCBOUNDS *b1, const PCBOUNDS *b2);
 
-/** Returns the bounds as an OGC WKB polygon */
-uint8_t *pc_bounds_to_wkb(const PCBOUNDS *bounds, uint32_t srid, size_t *wkbsize);
+/** Returns the bounds as an OGC WKB geometry */
+uint8_t *pc_bounds_to_geometry_wkb(const PCBOUNDS *bounds, uint32_t srid, size_t *wkbsize);
+
+/** Returns the bounds as a BOX3D */
+PCBOX3D *pc_bounds_to_box3d(const PCBOUNDS *bounds, uint32_t srid);
 
 /** Subset batch based on less-than condition on dimension */
 PCPATCH* pc_patch_filter_lt_by_name(const PCPATCH *pa, const char *name, double val);
