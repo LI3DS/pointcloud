@@ -23,8 +23,6 @@ This removes the CUnit dependency.
 
 ### Build ###
 
-#### CMake ####
-
 Make a build directory, and run ``cmake`` from there. Use ``ccmake`` to browse and set the options on your build.
 
 - ``mkdir build``
@@ -32,16 +30,6 @@ Make a build directory, and run ``cmake`` from there. Use ``ccmake`` to browse a
 - ``cmake ../``
 - ``make``
 - ``sudo make install``
-
-#### Autotools ####
-
-After generating the configure script with ``autogen``,  ``./configure --help`` to get a complete listing of configuration options.
-
-- ``./autogen.sh``
-- ``./configure``
-- ``make``
-- ``sudo make install``
-
 
 ### Activate ###
 

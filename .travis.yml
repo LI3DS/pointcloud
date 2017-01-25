@@ -12,15 +12,18 @@ install:
   - sh .install-lazperf.sh
 
 addons:
-  postgresql: "9.3" # for "installcheck"
+  postgresql: "9.3"
 
-before_script: ./autogen.sh
+before_script:
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_INSTALL_PREFIX=/usr/local ../
 
 script:
-  - ./configure CFLAGS="-Wall -O2 -g" --with-lazperf=/usr/local/
   - make
   - make check
   - valgrind --leak-check=full --error-exitcode=1 lib/cunit/cu_tester
   - sudo make install
   - make installcheck || { cat pgsql/regression.diffs && false; }
-  - cd tools/benchmark_compression && sh compression_benchmark.sh
+  - cd ../tools/benchmark_compression
+  - sh compression_benchmark.sh
