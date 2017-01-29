@@ -64,7 +64,7 @@ install (
   )
   
 install (
-  FILES ${PC_INSTALL_EXTENSIONS} 
+  FILES ${PC_INSTALL_EXTENSIONS}
   DESTINATION "${PGSQL_SHAREDIR}/extension"
   )
 

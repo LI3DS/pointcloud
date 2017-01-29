@@ -146,16 +146,16 @@ pc_patch_dimensional_filter(const PCPATCH_DIMENSIONAL *pdl, const PCBITMAP *map)
 	int i = 0;
 	PCPATCH_DIMENSIONAL *fpdl = pc_patch_dimensional_clone(pdl);
 
-    fpdl->stats = pc_stats_clone(pdl->stats);
+	fpdl->stats = pc_stats_clone(pdl->stats);
 	fpdl->npoints = map->nset;
 
 	for ( i = 0; i < pdl->schema->ndims; i++ )
 	{
 		PCDIMENSION *dim;
-        PCDOUBLESTAT stats;
-        stats.min = FLT_MAX;
-        stats.max = -1*FLT_MAX;
-        stats.sum = 0;
+		PCDOUBLESTAT stats;
+		stats.min = FLT_MAX;
+		stats.max = -1*FLT_MAX;
+		stats.sum = 0;
 		fpdl->bytes[i] = pc_bytes_filter(&(pdl->bytes[i]), map, &stats);
 
 
@@ -168,30 +168,28 @@ pc_patch_dimensional_filter(const PCPATCH_DIMENSIONAL *pdl, const PCBITMAP *map)
 		/* Save the X/Y stats for use in bounds later */
 		if ( i == pdl->schema->x_position )
 		{
-            fpdl->bounds.xmin = stats.min;
-            fpdl->bounds.xmax = stats.max;
-        }
+			fpdl->bounds.xmin = stats.min;
+			fpdl->bounds.xmax = stats.max;
+		}
 		else if ( i == pdl->schema->y_position )
 		{
-            fpdl->bounds.ymin = stats.min;
-            fpdl->bounds.ymax = stats.max;
-        }
-
+			fpdl->bounds.ymin = stats.min;
+			fpdl->bounds.ymax = stats.max;
+		}
 		else if ( i == pdl->schema->z_position )
 		{
-            fpdl->bounds.zmin = stats.min;
-            fpdl->bounds.zmax = stats.max;
-        }
-
+			fpdl->bounds.zmin = stats.min;
+			fpdl->bounds.zmax = stats.max;
+		}
 		else if ( i == pdl->schema->m_position )
 		{
-            fpdl->bounds.mmin = stats.min;
-            fpdl->bounds.mmax = stats.max;
-        }
+			fpdl->bounds.mmin = stats.min;
+			fpdl->bounds.mmax = stats.max;
+		}
 
-        pc_point_set_double_by_index(&(fpdl->stats->min), i, stats.min);
-        pc_point_set_double_by_index(&(fpdl->stats->max), i, stats.max);
-        pc_point_set_double_by_index(&(fpdl->stats->avg), i, stats.sum/fpdl->npoints);
+		pc_point_set_double_by_index(&(fpdl->stats->min), i, stats.min);
+		pc_point_set_double_by_index(&(fpdl->stats->max), i, stats.max);
+		pc_point_set_double_by_index(&(fpdl->stats->avg), i, stats.sum/fpdl->npoints);
 	}
 
 	return fpdl;

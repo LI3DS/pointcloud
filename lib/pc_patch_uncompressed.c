@@ -57,13 +57,13 @@ pc_patch_uncompressed_to_stringbuffer(const PCPATCH_UNCOMPRESSED *patch, stringb
 char *
 pc_patch_uncompressed_to_string(const PCPATCH_UNCOMPRESSED *patch)
 {
-  stringbuffer_t *sb = stringbuffer_create();
-  char *str;
-  if ( PC_FAILURE == pc_patch_uncompressed_to_stringbuffer(patch, sb) )
-    return NULL;
-  str = stringbuffer_release_string(sb);
-  stringbuffer_destroy(sb);
-  return str;
+	stringbuffer_t *sb = stringbuffer_create();
+	char *str;
+	if ( PC_FAILURE == pc_patch_uncompressed_to_stringbuffer(patch, sb) )
+		return NULL;
+	str = stringbuffer_release_string(sb);
+	stringbuffer_destroy(sb);
+	return str;
 }
 
 uint8_t *
@@ -175,10 +175,10 @@ pc_patch_uncompressed_make(const PCSCHEMA *s, uint32_t maxpoints)
 	/* Make our own data area */
 	datasize = s->size * maxpoints;
 	pch->datasize = datasize;
-    pch->data = NULL;
+	pch->data = NULL;
 	if ( datasize )
 	{
-    	pch->data = pcalloc(datasize);
+		pch->data = pcalloc(datasize);
 	}
 	pc_bounds_init(&(pch->bounds));
 
@@ -200,25 +200,25 @@ pc_patch_uncompressed_compute_extent(PCPATCH_UNCOMPRESSED *patch)
 		/* Just push the data buffer forward by one point at a time */
 		pt->data = patch->data + i * patch->schema->size;
 		if ( patch->schema->x_position > -1 ) {
-            v = pc_point_get_x(pt);
-            if ( b.xmin > v ) b.xmin = v;
-    		if ( b.xmax < v ) b.xmax = v;
-        }
+			v = pc_point_get_x(pt);
+			if ( b.xmin > v ) b.xmin = v;
+			if ( b.xmax < v ) b.xmax = v;
+		}
 		if ( patch->schema->y_position > -1 ) {
-            v = pc_point_get_y(pt);
-            if ( b.ymin > v ) b.ymin = v;
-    		if ( b.ymax < v ) b.ymax = v;
-        }
+			v = pc_point_get_y(pt);
+			if ( b.ymin > v ) b.ymin = v;
+			if ( b.ymax < v ) b.ymax = v;
+		}
 		if ( patch->schema->z_position > -1 ) {
-            v = pc_point_get_z(pt);
-            if ( b.zmin > v ) b.zmin = v;
-    		if ( b.zmax < v ) b.zmax = v;
-        }
+			v = pc_point_get_z(pt);
+			if ( b.zmin > v ) b.zmin = v;
+			if ( b.zmax < v ) b.zmax = v;
+		}
 		if ( patch->schema->m_position > -1 ) {
-            v = pc_point_get_m(pt);
-            if ( b.mmin > v ) b.mmin = v;
-    		if ( b.mmax < v ) b.mmax = v;
-        }
+			v = pc_point_get_m(pt);
+			if ( b.mmin > v ) b.mmin = v;
+			if ( b.mmax < v ) b.mmax = v;
+		}
 	}
 
 	patch->bounds = b;
@@ -350,7 +350,7 @@ pc_patch_uncompressed_from_dimensional(const PCPATCH_DIMENSIONAL *pdl)
 	patch->npoints = npoints;
 	patch->maxpoints = npoints;
 	patch->bounds = pdl->bounds;
-    patch->stats = pc_stats_clone(pdl->stats);
+	patch->stats = pc_stats_clone(pdl->stats);
 	patch->datasize = schema->size * pdl->npoints;
 	patch->data = pcalloc(patch->datasize);
 	buf = patch->data;

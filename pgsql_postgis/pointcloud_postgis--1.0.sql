@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION PC_Intersection(pcpatch, geometry)
             ipts AS (SELECT pt FROM pgpts WHERE ST_Intersects(pgpt, $2)),
             ipch AS (SELECT PC_Patch(pt) AS pch FROM ipts)
         SELECT pch FROM ipch;
-    $$ 
+    $$
     LANGUAGE 'sql';
 
 -----------------------------------------------------------------------------
@@ -20,7 +20,7 @@ CREATE OR REPLACE FUNCTION PC_Envelope(pcpatch)
     RETURNS geometry AS
     $$
         SELECT ST_GeomFromEWKB(PC_Envelope_AsBinary($1))
-    $$ 
+    $$
     LANGUAGE 'sql';
 
 CREATE CAST (pcpatch AS geometry) WITH FUNCTION PC_Envelope(pcpatch);
@@ -32,7 +32,7 @@ CREATE OR REPLACE FUNCTION geometry(pcpoint)
     RETURNS geometry AS
     $$
         SELECT ST_GeomFromEWKB(PC_AsBinary($1))
-    $$ 
+    $$
     LANGUAGE 'sql';
 
 CREATE CAST (pcpoint AS geometry) WITH FUNCTION geometry(pcpoint);
@@ -45,14 +45,14 @@ CREATE OR REPLACE FUNCTION PC_Intersects(pcpatch, geometry)
     RETURNS boolean AS
     $$
         SELECT ST_Intersects($2, PC_Envelope($1))
-    $$ 
+    $$
     LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION PC_Intersects(geometry, pcpatch)
     RETURNS boolean AS
     $$
         SELECT PC_Intersects($2, $1)
-    $$ 
+    $$
     LANGUAGE 'sql';
 
 -----------------------------------------------------------------------------
@@ -61,5 +61,5 @@ CREATE OR REPLACE FUNCTION PC_Intersects(geometry, pcpatch)
 CREATE OR REPLACE FUNCTION Box3D(p pcpatch)
 	RETURNS BOX3D AS 'MODULE_PATHNAME', 'pcpatch_box3d'
 	LANGUAGE 'c' IMMUTABLE STRICT;
-		
+
 CREATE CAST (pcpatch AS BOX3D) WITH FUNCTION Box3D(pcpatch);

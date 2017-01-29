@@ -329,22 +329,22 @@ pc_point_to_geometry_wkb(const PCPOINT *pt, size_t *wkbsize)
 	uint32_t srid;
 	double x, y, z, m;
 
-    if (pt->schema->x_position < 0 || pt->schema->y_position < 0 )
-        return NULL;
-        
-	if ( pt->schema->z_position >= 0 )
+	if (pt->schema->x_position < 0 || pt->schema->y_position < 0 )
+		return NULL;
+
+	if ( pt->schema->z_position > -1 )
 	{
 		wkbtype |= z_mask;
 		size += 8;
 	}
-	
-	if ( pt->schema->m_position >= 0 )
+
+	if ( pt->schema->m_position > -1 )
 	{
 		wkbtype |= m_mask;
 		size += 8;
 	}
 
-	if ( pt->schema->srid > 0 )
+	if ( pt->schema->srid != 0 )
 	{
 		wkbtype |= srid_mask;
 		size += 4;
@@ -360,9 +360,9 @@ pc_point_to_geometry_wkb(const PCPOINT *pt, size_t *wkbsize)
 	memcpy(ptr, &wkbtype, 4); /* WKB type */
 	ptr += 4;
 
-	if ( pt->schema->srid > 0 )
+	if ( pt->schema->srid != 0 )
 	{
-        srid = pt->schema->srid;
+		srid = pt->schema->srid;
 		memcpy(ptr, &srid, 4); /* SRID */
 		ptr += 4;
 	}
@@ -377,14 +377,14 @@ pc_point_to_geometry_wkb(const PCPOINT *pt, size_t *wkbsize)
 
 	if ( pt->schema->z_position > -1 )
 	{
-    	z = pc_point_get_z(pt);
+		z = pc_point_get_z(pt);
 		memcpy(ptr, &z, 8); /* Z */
 		ptr += 8;
 	}
-	
+
 	if ( pt->schema->m_position > -1 )
 	{
-    	m = pc_point_get_m(pt);
+		m = pc_point_get_m(pt);
 		memcpy(ptr, &m, 8); /* M */
 		ptr += 8;
 	}

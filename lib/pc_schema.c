@@ -330,6 +330,57 @@ pc_schema_to_json(const PCSCHEMA *pcs)
 	return str;
 }
 
+void pc_schema_check_xyzm(PCSCHEMA *s)
+{
+	int i;
+	for ( i = 0; i < s->ndims; i++ )
+	{
+		char *dimname = s->dims[i]->name;
+		if ( ! dimname ) continue;
+		if ( strcasecmp(dimname, "X") == 0 ||
+			strcasecmp(dimname, "Longitude") == 0 ||
+			strcasecmp(dimname, "Lon") == 0 )
+		{
+			s->x_position = i;
+			continue;
+		}
+		if ( strcasecmp(dimname, "Y") == 0 ||
+			strcasecmp(dimname, "Latitude") == 0 ||
+			strcasecmp(dimname, "Lat") == 0 )
+		{
+			s->y_position = i;
+			continue;
+		}
+		if ( strcasecmp(dimname, "Z") == 0 ||
+			strcasecmp(dimname, "H") == 0 ||
+			strcasecmp(dimname, "Height") == 0 )
+		{
+			s->z_position = i;
+			continue;
+		}
+		if ( strcasecmp(dimname, "M") == 0 ||
+			strcasecmp(dimname, "T") == 0 ||
+			strcasecmp(dimname, "Time") == 0 )
+		{
+			s->m_position = i;
+			continue;
+		}
+	}
+
+	if ( s->x_position < 0 )
+	{
+		pcerror("pc_schema_check_xyzm: invalid x_position '%d'", s->x_position);
+		return;
+	}
+
+	if ( s->y_position < 0 )
+	{
+		pcerror("pc_schema_check_xyzm: invalid y_position '%d'", s->y_position);
+		return;
+	}
+}
+
+
 static char *
 xml_node_get_content(xmlNodePtr node)
 {
@@ -438,33 +489,7 @@ pc_schema_from_xml(const char *xml_str, PCSCHEMA **schema)
 						char *content = (char*)(child->children->content);
 						char *name = (char*)(child->name);
 						if ( strcmp(name, "name") == 0 )
-						{
-							if ( strcasecmp(content, "X") == 0 ||
-							        strcasecmp(content, "Longitude") == 0 ||
-							        strcasecmp(content, "Lon") == 0 )
-							{
-        						s->x_position = d->position;
-							}
-							if ( strcasecmp(content, "Y") == 0 ||
-							        strcasecmp(content, "Latitude") == 0 ||
-							        strcasecmp(content, "Lat") == 0 )
-							{
-                                s->y_position = d->position;
-                        	}
-							if ( strcasecmp(content, "Z") == 0 ||
-							        strcasecmp(content, "Altitude") == 0 ||
-							        strcasecmp(content, "Height") == 0 )
-							{
-                            	s->z_position = d->position;
-                        	}
-							if ( strcasecmp(content, "T") == 0 ||
-							        strcasecmp(content, "Time") == 0 ||
-							        strcasecmp(content, "GPS_Time") == 0 )
-							{
-                                s->m_position = d->position;
-							}
 							d->name = pcstrdup(content);
-						}
 						else if ( strcmp(name, "description") == 0 )
 							d->description = pcstrdup(content);
 						else if ( strcmp(name, "size") == 0 )
@@ -499,7 +524,7 @@ pc_schema_from_xml(const char *xml_str, PCSCHEMA **schema)
 						xmlXPathFreeObject(xpath_obj);
 						xmlXPathFreeContext(xpath_ctx);
 						xmlFreeDoc(xml_doc);
-                		xmlCleanupParser();
+						xmlCleanupParser();
 						pc_schema_free(s);
 						pcwarn("schema dimension at position \"%d\" is declared twice", d->position + 1, ndims);
 						return PC_FAILURE;
@@ -512,7 +537,7 @@ pc_schema_from_xml(const char *xml_str, PCSCHEMA **schema)
 					xmlXPathFreeContext(xpath_ctx);
 					xmlFreeDoc(xml_doc);
 					xmlCleanupParser();
-            		pc_schema_free(s);
+					pc_schema_free(s);
 					pcwarn("schema dimension states position \"%d\", but number of XML dimensions is \"%d\"", d->position + 1, ndims);
 					return PC_FAILURE;
 				}
@@ -521,6 +546,8 @@ pc_schema_from_xml(const char *xml_str, PCSCHEMA **schema)
 
 		/* Complete the byte offsets of dimensions from the ordered sizes */
 		pc_schema_calculate_byteoffsets(s);
+		/* Check X/Y positions */
+		pc_schema_check_xyzm(s);
 	}
 
 	xmlXPathFreeObject(xpath_obj);
