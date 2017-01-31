@@ -10,7 +10,7 @@ set ( PC_HEADERS
   pc_pgsql.h
   )
 
-set ( PC_INSTALL_EXENSIONS
+set ( PC_INSTALL_EXTENSIONS
   "${PROJECT_BINARY_DIR}/pgsql/pointcloud--${POINTCLOUD_VERSION}.sql"
   "${PROJECT_BINARY_DIR}/pgsql/pointcloud.control"
   )
@@ -64,7 +64,7 @@ install (
   )
   
 install (
-  FILES ${PC_INSTALL_EXENSIONS} 
+  FILES ${PC_INSTALL_EXTENSIONS}
   DESTINATION "${PGSQL_SHAREDIR}/extension"
   )
 

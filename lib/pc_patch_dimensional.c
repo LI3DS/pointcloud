@@ -17,13 +17,13 @@
 /*
 typedef struct
 {
-    int type;
+	int type;
 	int8_t readonly;
 	const PCSCHEMA *schema;
 	uint32_t npoints;
-	double xmin, xmax, ymin, ymax;
+	double xmin, xmax, ymin, ymax, zmin, zmax, mmin, mmax;
 	PCSTATS *stats;
-    PCBYTES *bytes;
+	PCBYTES *bytes;
 } PCPATCH_DIMENSIONAL;
 */
 
@@ -179,7 +179,7 @@ pc_patch_dimensional_free(PCPATCH_DIMENSIONAL *pdl)
 int
 pc_patch_dimensional_compute_extent(PCPATCH_DIMENSIONAL *pdl)
 {
-	double xmin, xmax, ymin, ymax, xavg, yavg;
+	double min, max, avg;
 	int rv;
 	PCBYTES *pcb;
 
@@ -187,22 +187,44 @@ pc_patch_dimensional_compute_extent(PCPATCH_DIMENSIONAL *pdl)
 	assert(pdl->schema);
 
 	/* Get x extremes */
-	pcb = &(pdl->bytes[pdl->schema->x_position]);
-	rv = pc_bytes_minmax(pcb, &xmin, &xmax, &xavg);
-	if ( PC_FAILURE == rv ) return PC_FAILURE;
-	xmin = pc_value_scale_offset(xmin, pdl->schema->dims[pdl->schema->x_position]);
-	xmax = pc_value_scale_offset(xmax, pdl->schema->dims[pdl->schema->x_position]);
-	pdl->bounds.xmin = xmin;
-	pdl->bounds.xmax = xmax;
+	if(pdl->schema->x_position!=-1)
+	{
+		pcb = &(pdl->bytes[pdl->schema->x_position]);
+		rv = pc_bytes_minmax(pcb, &min, &max, &avg);
+		if ( PC_FAILURE == rv ) return PC_FAILURE;
+		pdl->bounds.xmin = pc_value_scale_offset(min, pdl->schema->dims[pdl->schema->x_position]);
+		pdl->bounds.xmax = pc_value_scale_offset(max, pdl->schema->dims[pdl->schema->x_position]);
+	}
 
 	/* Get y extremes */
-	pcb = &(pdl->bytes[pdl->schema->y_position]);
-	rv = pc_bytes_minmax(pcb, &ymin, &ymax, &yavg);
-	if ( PC_FAILURE == rv ) return PC_FAILURE;
-	ymin = pc_value_scale_offset(ymin, pdl->schema->dims[pdl->schema->y_position]);
-	ymax = pc_value_scale_offset(ymax, pdl->schema->dims[pdl->schema->y_position]);
-	pdl->bounds.ymin = ymin;
-	pdl->bounds.ymax = ymax;
+	if(pdl->schema->y_position!=-1)
+	{
+		pcb = &(pdl->bytes[pdl->schema->y_position]);
+		rv = pc_bytes_minmax(pcb, &min, &max, &avg);
+		if ( PC_FAILURE == rv ) return PC_FAILURE;
+		pdl->bounds.ymin = pc_value_scale_offset(min, pdl->schema->dims[pdl->schema->y_position]);
+		pdl->bounds.ymax = pc_value_scale_offset(max, pdl->schema->dims[pdl->schema->y_position]);
+	}
+
+	/* Get z extremes */
+	if(pdl->schema->z_position!=-1)
+	{
+		pcb = &(pdl->bytes[pdl->schema->z_position]);
+		rv = pc_bytes_minmax(pcb, &min, &max, &avg);
+		if ( PC_FAILURE == rv ) return PC_FAILURE;
+		pdl->bounds.zmin = pc_value_scale_offset(min, pdl->schema->dims[pdl->schema->z_position]);
+		pdl->bounds.zmax = pc_value_scale_offset(max, pdl->schema->dims[pdl->schema->z_position]);
+	}
+
+	/* Get m extremes */
+	if(pdl->schema->m_position!=-1)
+	{
+		pcb = &(pdl->bytes[pdl->schema->m_position]);
+		rv = pc_bytes_minmax(pcb, &min, &max, &avg);
+		if ( PC_FAILURE == rv ) return PC_FAILURE;
+		pdl->bounds.mmin = pc_value_scale_offset(min, pdl->schema->dims[pdl->schema->m_position]);
+		pdl->bounds.mmax = pc_value_scale_offset(max, pdl->schema->dims[pdl->schema->m_position]);
+	}
 
 	return PC_SUCCESS;
 }
@@ -307,17 +329,17 @@ pc_patch_dimensional_from_pointlist(const PCPOINTLIST *pdl)
 /** get point n, 0-based, positive */
 PCPOINT *pc_patch_dimensional_pointn(const PCPATCH_DIMENSIONAL *pdl, int n)
 {
-    assert(pdl);
-    assert(pdl->schema);
-    int i;
-    int ndims = pdl->schema->ndims;
-    PCPOINT *pt = pc_point_make(pdl->schema);
-    uint8_t *buf = pt->data;
-    for ( i = 0; i < ndims; i++ )
-    {
-        PCDIMENSION *dim = pc_schema_get_dimension(pdl->schema, i);
-        pc_bytes_to_ptr(buf+dim->byteoffset,pdl->bytes[i], n);
-    }
+	assert(pdl);
+	assert(pdl->schema);
+	int i;
+	int ndims = pdl->schema->ndims;
+	PCPOINT *pt = pc_point_make(pdl->schema);
+	uint8_t *buf = pt->data;
+	for ( i = 0; i < ndims; i++ )
+	{
+		PCDIMENSION *dim = pc_schema_get_dimension(pdl->schema, i);
+		pc_bytes_to_ptr(buf+dim->byteoffset,pdl->bytes[i], n);
+	}
 
-    return pt;
+	return pt;
 }
