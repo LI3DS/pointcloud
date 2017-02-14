@@ -156,7 +156,7 @@ int pc_dimstats_update(PCDIMSTATS *pds, const PCPATCH_DIMENSIONAL *pdl);
 /** Free the PCDIMSTATS memory */
 void pc_dimstats_free(PCDIMSTATS *pds);
 char* pc_dimstats_to_string(const PCDIMSTATS *pds);
-
+PCSTATS *pc_stats_new(const PCSCHEMA *schema);
 
 /****************************************************************************
 * PATCHES
@@ -305,4 +305,3 @@ void pc_matrix_multiply_vector(PCVEC3 rotatedvec, const PCMAT33 mat, const PCVEC
 void pc_matrix_transform_affine(PCVEC3 res, const PCMAT43 mat, const PCVEC3 vec);
 
 #endif /* _PC_API_INTERNAL_H */
-

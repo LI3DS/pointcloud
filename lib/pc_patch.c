@@ -613,50 +613,214 @@ PCPOINT *pc_patch_pointn(const PCPATCH *patch, int n)
     return NULL;
 }
 
+#define PC_PATCH_SET_SCHEMA_COPY_RAW_VALUES 1
+#define PC_PATCH_SET_SCHEMA_MEMCPY 1
+
+#if PC_PATCH_SET_SCHEMA_MEMCPY
+
+typedef struct
+{
+  uint32_t size;
+  uint32_t obyteoffset;
+  uint32_t nbyteoffset;
+} PCMEMCPY;
+
+void pc_point_copy( const PCPOINT *opt, const PCMEMCPY *cpy, uint32_t ncpy, PCPOINT *npt )
+{
+  int j;
+  for ( j = 0; j < ncpy; j++ )
+  {
+ // do not interpret the value, copy the raw payload
+ // defaults to 0 for the raw value
+        char *ndata = npt->data + cpy[j].nbyteoffset;
+        char *odata = opt->data + cpy[j].obyteoffset;
+        memcpy(ndata,odata,cpy[j].size);
+  }
+}
+
+
+#else
+
+void pc_point_copy( const PCPOINT *in, const PCDIMENSION **dims, PCPOINT *out )
+{
+  int j;
+  for ( j = 0; j < out->schema->ndims; j++ )
+  {
+#if PC_PATCH_SET_SCHEMA_COPY_RAW_VALUES
+ // do not interpret the value, copy the raw payload
+ // defaults to 0 for the raw value
+    if ( dims[j] )
+    {
+        char *dataout = out->data + out->schema->dims[j]->byteoffset;
+        char *datain  = in ->data +              dims[j]->byteoffset;
+        memcpy(dataout,datain,dims[j]->size);
+    }
+#else
+    // interpret the value, apply the scale/offset change
+    // defaults to 0 for the interpreted value
+    double val = 0.0;
+    if ( dims[j] )
+        pc_point_get_double(in, dims[j], &val);
+
+    pc_point_set_double(out, out->schema->dims[j], val);
+#endif
+  }
+}
+
+#endif
+
+
 /** set schema for patch */
 PCPATCH*
 pc_patch_set_schema(const PCPATCH *patch, const PCSCHEMA *new_schema)
 {
+    PCPATCH *pain = NULL;
     PCPATCH_UNCOMPRESSED *paout = NULL;
-    PCPOINTLIST *opl, *npl;
-    PCPOINT *opt, *npt;
+    PCPOINT opt, npt;
     double val;
-    size_t i, j;
+    size_t i;
     char *name;
-    PCDIMENSION *dim;
-    const PCSCHEMA *old_schema;
 
-    old_schema = patch->schema;
-
-    // init point lists
-    opl = pc_pointlist_from_patch(patch);
-    npl = pc_pointlist_make(patch->npoints);
-
-    // build the new pointlist
-    for ( i = 0; i <patch->npoints; i++ )
+    // Get the reordered input dims
+#if PC_PATCH_SET_SCHEMA_MEMCPY
+    const PCDIMENSION *dim = NULL;
+    PCMEMCPY *mcpy = pcalloc(new_schema->ndims * sizeof(PCMEMCPY));
+    uint32_t m = 0;
+#else
+    const PCDIMENSION **dims = pcalloc(new_schema->ndims * sizeof(PCDIMENSION *));
+#endif
+    for ( i = 0; i < new_schema->ndims; i++ )
     {
-        opt = pc_pointlist_get_point(opl, i);
-        npt = pc_point_make(new_schema);
-
-        for ( j = 0; j < new_schema->ndims; j++ )
-        {
-            name = new_schema->dims[j]->name;
-            dim = pc_schema_get_dimension_by_name(old_schema, name);
-
-            val = 0.0;
-            if ( dim != NULL )
-                pc_point_get_double(opt, dim, &val);
-
-            pc_point_set_double(npt, new_schema->dims[j], val);
-        }
-
-        pc_pointlist_add_point(npl, npt);
+      name = new_schema->dims[i]->name;
+#if PC_PATCH_SET_SCHEMA_MEMCPY
+      dim = pc_schema_get_dimension_by_name(patch->schema, name);
+      if(dim && dim->interpretation != new_schema->dims[i]->interpretation)
+          pcerror("%s : interpretations are not matching",__func__);
+      // if possible, coalesce memcpys
+      if(m == 0 || mcpy[m-1].obyteoffset+mcpy[m-1].size != dim->byteoffset)
+      {
+        mcpy[m].obyteoffset = dim->byteoffset;
+        mcpy[m].nbyteoffset = new_schema->dims[i]->byteoffset;
+        mcpy[m].size = dim->size;
+        ++m;
+      }
+      else
+      {
+        mcpy[m-1].size += dim->size;
+      }
+#else
+      dims[i] = pc_schema_get_dimension_by_name(patch->schema, name);
+#endif
     }
 
-    paout = pc_patch_uncompressed_from_pointlist(npl);
+    // prepare uncompressed input and output patches
+    pain  = pc_patch_uncompress(patch);
+    paout = pc_patch_uncompressed_make(new_schema,patch->npoints);
+    paout->npoints = pain->npoints;
 
-    pc_pointlist_free(npl);
-    pc_pointlist_free(opl);
+    // setup input and output points
+    opt.schema = patch->schema;
+    npt.schema = new_schema;
+    opt.readonly = PC_TRUE;
+    npt.readonly = PC_TRUE;
+
+    // process the point set
+    opt.data = ((PCPATCH_UNCOMPRESSED *)pain)->data;
+    npt.data = paout->data;
+
+#if PC_PATCH_SET_SCHEMA_MEMCPY
+    if( m==0 )
+    {
+      // all dimensions are new, no copy
+    }
+    else if(opt.schema->size==npt.schema->size && mcpy[0].size==npt.schema->size)
+    {
+      // memcpy of the entire patch coalesces to a single memcpy of the whole data
+        memcpy(npt.data,opt.data,npt.schema->size*patch->npoints);
+pcinfo("entire ! %d %d %d %d %d\n",mcpy[0].nbyteoffset,mcpy[0].obyteoffset,mcpy[0].size,npt.schema->size,opt.schema->size);
+    }
+    else for ( i = 0; i <patch->npoints; i++ )
+    {
+      // fragmented memcpys
+      pc_point_copy(&opt,mcpy,m,&npt);
+      opt.data += opt.schema->size;
+      npt.data += npt.schema->size;
+    }
+#else
+    for ( i = 0; i <patch->npoints; i++ )
+    {
+      pc_point_copy(&opt,dims,&npt);
+      opt.data += opt.schema->size;
+      npt.data += npt.schema->size;
+    }
+#endif
+
+    // update the stats and bounds
+    if(patch->stats)
+    {
+      paout->stats = pc_stats_new(new_schema);
+
+      opt.data = patch->stats->min.data;
+      npt.data = paout->stats->min.data;
+  #if PC_PATCH_SET_SCHEMA_MEMCPY
+        pc_point_copy(&opt,mcpy,m,&npt);
+  #else
+        pc_point_copy(&opt,dims,&npt);
+  #endif
+
+      opt.data = patch->stats->max.data;
+      npt.data = paout->stats->max.data;
+  #if PC_PATCH_SET_SCHEMA_MEMCPY
+        pc_point_copy(&opt,mcpy,m,&npt);
+  #else
+        pc_point_copy(&opt,dims,&npt);
+  #endif
+
+      opt.data = patch->stats->avg.data;
+      npt.data = paout->stats->avg.data;
+  #if PC_PATCH_SET_SCHEMA_MEMCPY
+        pc_point_copy(&opt,mcpy,m,&npt);
+  #else
+        pc_point_copy(&opt,dims,&npt);
+  #endif
+
+#if PC_PATCH_SET_SCHEMA_COPY_RAW_VALUES
+      paout->bounds.xmin = pc_point_get_x(&paout->stats->min);
+      paout->bounds.ymin = pc_point_get_y(&paout->stats->min);
+      paout->bounds.xmax = pc_point_get_x(&paout->stats->max);
+      paout->bounds.ymax = pc_point_get_y(&paout->stats->max);
+    }
+    else
+    {
+      PCDIMENSION *odimx = opt.schema->dims[opt.schema->x_position];
+      PCDIMENSION *odimy = opt.schema->dims[opt.schema->y_position];
+      PCDIMENSION *ndimx = npt.schema->dims[opt.schema->x_position];
+      PCDIMENSION *ndimy = npt.schema->dims[opt.schema->y_position];
+
+      double xscale = ndimx->scale / odimx->scale;
+      double yscale = ndimy->scale / odimy->scale;
+      double xoffset = ndimx->offset - xscale * odimx->offset;
+      double yoffset = ndimy->offset - yscale * odimy->offset;
+
+      paout->bounds.xmin = patch->bounds.xmin*xscale + xoffset;
+      paout->bounds.xmax = patch->bounds.xmax*xscale + xoffset;
+      paout->bounds.ymin = patch->bounds.ymin*yscale + yoffset;
+      paout->bounds.ymax = patch->bounds.ymax*yscale + yoffset;
+    }
+#else
+    }
+    paout->bounds = patch->bounds;
+#endif
+
+
+#if PC_PATCH_SET_SCHEMA_MEMCPY
+    pcfree(mcpy);
+#else
+    pcfree(dims);
+#endif
+
+    if(pain != patch)
+      pc_patch_free(pain);
 
     return (PCPATCH*) paout;
 }
