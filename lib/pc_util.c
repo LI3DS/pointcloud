@@ -238,21 +238,41 @@ uncompressed_bytes_flip_endian(const uint8_t *bytebuf, const PCSCHEMA *schema, u
 int
 pc_bounds_intersects(const PCBOUNDS *b1, const PCBOUNDS *b2)
 {
-	if (	b1->xmin > b2->xmax ||
-		b1->xmax < b2->xmin ||
-		b1->ymin > b2->ymax ||
-		b1->ymax < b2->ymin )
+	if ( b1->xmin > b2->xmax ||
+		 b1->xmax < b2->xmin ||
+		 b1->ymin > b2->ymax ||
+		 b1->ymax < b2->ymin )
 	{
 		return PC_FALSE;
 	}
+
+	if ( b1->zmin == DBL_MAX && b2->zmin == DBL_MAX )
+	{
+		// b1 and b2 are both 2d, so we are done
+		return PC_TRUE;
+	}
+
+	if ( b1->zmin == DBL_MAX ||
+		 b2->zmin == DBL_MAX )
+	{
+		// b1 is 2d and b2 is 3d, or vice-versa
+		return PC_FALSE;
+	}
+
+	if ( b1->zmin > b2->zmax ||
+		 b1->zmax < b2->zmin )
+	{
+		return PC_FALSE;
+	}
+
 	return PC_TRUE;
 }
 
 void
 pc_bounds_init(PCBOUNDS *b)
 {
-	b->xmin = b->ymin = DBL_MAX;
-	b->xmax = b->ymax = -1*DBL_MAX;
+	b->xmin = b->ymin = b->zmin = DBL_MAX;
+	b->xmax = b->ymax = b->zmax = -1*DBL_MAX;
 }
 
 void pc_bounds_merge(PCBOUNDS *b1, const PCBOUNDS *b2)
@@ -261,5 +281,10 @@ void pc_bounds_merge(PCBOUNDS *b1, const PCBOUNDS *b2)
 	if ( b2->ymin < b1->ymin ) b1->ymin = b2->ymin;
 	if ( b2->xmax > b1->xmax ) b1->xmax = b2->xmax;
 	if ( b2->ymax > b1->ymax ) b1->ymax = b2->ymax;
+	if ( b1->zmin != DBL_MAX && b2->zmin != DBL_MAX )
+	{
+		if ( b2->zmin < b1->zmin ) b1->zmin = b2->zmin;
+		if ( b2->zmax > b1->zmax ) b1->zmax = b2->zmax;
+	}
 }
 

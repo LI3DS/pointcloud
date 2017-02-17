@@ -179,7 +179,7 @@ pc_patch_dimensional_free(PCPATCH_DIMENSIONAL *pdl)
 int
 pc_patch_dimensional_compute_extent(PCPATCH_DIMENSIONAL *pdl)
 {
-	double xmin, xmax, ymin, ymax, xavg, yavg;
+	double xmin, xmax, ymin, ymax, zmin, zmax, xavg, yavg, zavg;
 	int rv;
 	PCBYTES *pcb;
 
@@ -203,6 +203,18 @@ pc_patch_dimensional_compute_extent(PCPATCH_DIMENSIONAL *pdl)
 	ymax = pc_value_scale_offset(ymax, pdl->schema->dims[pdl->schema->y_position]);
 	pdl->bounds.ymin = ymin;
 	pdl->bounds.ymax = ymax;
+
+	if ( pdl->schema->z_position > -1 )
+	{
+		/* Get z extremes */
+		pcb = &(pdl->bytes[pdl->schema->z_position]);
+		rv = pc_bytes_minmax(pcb, &zmin, &zmax, &zavg);
+		if ( PC_FAILURE == rv ) return PC_FAILURE;
+		ymin = pc_value_scale_offset(zmin, pdl->schema->dims[pdl->schema->z_position]);
+		ymax = pc_value_scale_offset(zmax, pdl->schema->dims[pdl->schema->z_position]);
+		pdl->bounds.zmin = zmin;
+		pdl->bounds.zmax = zmax;
+	}
 
 	return PC_SUCCESS;
 }

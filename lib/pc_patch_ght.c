@@ -402,6 +402,9 @@ pc_patch_ght_compute_extent(PCPATCH_GHT *patch)
 	patch->bounds.ymin = area.y.min;
 	patch->bounds.ymax = area.y.max;
 
+	// GHT does not have z.min and z.max, so a 2d bounds
+	// is used although the patch may be 3d
+
 	// ght_tree_free(tree);
 
 	return PC_SUCCESS;
