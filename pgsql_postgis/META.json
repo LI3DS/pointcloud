@@ -2,7 +2,7 @@
 	"name": "pointcloud_postgis",
 	"abstract": "PostGIS integration functions for Pointcloud",
 	"description": "Provides GIS overlay and vector/raster hooks for point clou data.",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"release_status": "unstable",
 	"maintainer": "Paul Ramsey",
 	"license": "bsd",
@@ -18,7 +18,7 @@
       "runtime": {
          "requires": {
             "postgis": "2.0.0",
-            "pointcloud": "1.0.0"
+            "pointcloud": "1.1.0"
          }
       }
     },
@@ -34,7 +34,7 @@
 		}
 	},
 	"meta-spec": {
-		"version": "1.0.0",
+		"version": "1.1.0",
 		"url": "http://pgxn.org/meta/spec.txt"
 	},
 	"tags": [

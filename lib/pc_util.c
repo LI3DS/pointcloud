@@ -241,7 +241,11 @@ pc_bounds_intersects(const PCBOUNDS *b1, const PCBOUNDS *b2)
 	if (	b1->xmin > b2->xmax ||
 		b1->xmax < b2->xmin ||
 		b1->ymin > b2->ymax ||
-		b1->ymax < b2->ymin )
+		b1->ymax < b2->ymin ||
+		b1->zmin > b2->zmax ||
+		b1->zmax < b2->zmin ||
+		b1->mmin > b2->mmax ||
+		b1->mmax < b2->mmin )
 	{
 		return PC_FALSE;
 	}
@@ -249,17 +253,173 @@ pc_bounds_intersects(const PCBOUNDS *b1, const PCBOUNDS *b2)
 }
 
 void
-pc_bounds_init(PCBOUNDS *b)
+pc_bounds_init(PCBOUNDS *b, const PCSCHEMA *schema)
 {
-	b->xmin = b->ymin = DBL_MAX;
-	b->xmax = b->ymax = -1*DBL_MAX;
+	b->xmin = (schema->x_position == -1) ? -DBL_MAX : DBL_MAX;
+	b->ymin = (schema->y_position == -1) ? -DBL_MAX : DBL_MAX;
+	b->zmin = (schema->z_position == -1) ? -DBL_MAX : DBL_MAX;
+	b->mmin = (schema->m_position == -1) ? -DBL_MAX : DBL_MAX;
+
+	b->xmax = -b->xmin;
+	b->ymax = -b->ymin;
+	b->zmax = -b->zmin;
+	b->mmax = -b->mmin;
 }
 
 void pc_bounds_merge(PCBOUNDS *b1, const PCBOUNDS *b2)
 {
 	if ( b2->xmin < b1->xmin ) b1->xmin = b2->xmin;
 	if ( b2->ymin < b1->ymin ) b1->ymin = b2->ymin;
+	if ( b2->zmin < b1->zmin ) b1->zmin = b2->zmin;
+	if ( b2->mmin < b1->mmin ) b1->mmin = b2->mmin;
 	if ( b2->xmax > b1->xmax ) b1->xmax = b2->xmax;
 	if ( b2->ymax > b1->ymax ) b1->ymax = b2->ymax;
+	if ( b2->zmax > b1->zmax ) b1->zmax = b2->zmax;
+	if ( b2->mmax > b1->mmax ) b1->mmax = b2->mmax;
 }
 
+void pc_bounds_expand(PCBOUNDS *b, const PCPOINT *p)
+{
+	double v;
+
+	if(p->schema->x_position > -1)
+	{
+		v = pc_point_get_x(p);
+		if ( b->xmin > v ) b->xmin = v;
+		if ( b->xmax < v ) b->xmax = v;
+	}
+
+	if(p->schema->y_position > -1)
+	{
+		v = pc_point_get_y(p);
+		if ( b->ymin > v ) b->ymin = v;
+		if ( b->ymax < v ) b->ymax = v;
+	}
+
+	if(p->schema->z_position > -1)
+	{
+		v = pc_point_get_z(p);
+		if ( b->zmin > v ) b->zmin = v;
+		if ( b->zmax < v ) b->zmax = v;
+	}
+
+	if(p->schema->m_position > -1)
+	{
+		v = pc_point_get_m(p);
+		if ( b->mmin > v ) b->mmin = v;
+		if ( b->mmax < v ) b->mmax = v;
+	}
+}
+
+uint8_t *
+wkb_set_double(uint8_t *wkb, double d)
+{
+	memcpy(wkb, &d, 8);
+	wkb += 8;
+	return wkb;
+}
+
+uint8_t *
+wkb_set_uint32(uint8_t *wkb, uint32_t i)
+{
+	memcpy(wkb, &i, 4);
+	wkb += 4;
+	return wkb;
+}
+
+uint8_t *
+wkb_set_char(uint8_t *wkb, char c)
+{
+	memcpy(wkb, &c, 1);
+	wkb += 1;
+	return wkb;
+}
+
+uint8_t *
+pc_bounds_to_geometry_wkb(const PCBOUNDS *bounds, uint32_t srid, size_t *wkbsize)
+{
+	/* Bounds! */
+	double xmin = bounds->xmin;
+	double ymin = bounds->ymin;
+	double xmax = bounds->xmax;
+	double ymax = bounds->ymax;
+
+	static uint32_t srid_mask = 0x20000000;
+	static uint32_t nrings = 1;
+	static uint32_t npoints_by_type[] = { 0, 1, 2, 5 };
+	uint32_t wkbtype = 1 + (xmin!=xmax) + (ymin!=ymax); /* WKB POINT, LINESTRING or POLYGON */
+	uint32_t npoints = npoints_by_type[wkbtype];
+	uint8_t *wkb, *ptr;
+	size_t size = 1 + wkbtype*4 + npoints*2*8; /* endian + type + (nrings?) + (npoints?) + npoints dbl pt */
+
+	if ( srid )
+	{
+		wkbtype |= srid_mask;
+		size += 4;
+	}
+
+	if ( wkbsize ) *wkbsize = size;
+	wkb = pcalloc(size);
+	ptr = wkb;
+
+	ptr = wkb_set_char(ptr, machine_endian()); /* Endian flag */
+
+	ptr = wkb_set_uint32(ptr, wkbtype); /* TYPE = POINT, LINESTRING or POLYGON */
+
+	if ( srid )
+	{
+		ptr = wkb_set_uint32(ptr, srid); /* SRID */
+	}
+
+
+	switch( npoints )
+	{
+	case 5 : ptr = wkb_set_uint32(ptr, nrings);  /* NRINGS = 1 */
+	case 2 : ptr = wkb_set_uint32(ptr, npoints); /* NPOINTS = 1, 2 or 5 */
+	}
+
+	/* Point 0 */
+	ptr = wkb_set_double(ptr, xmin);
+	ptr = wkb_set_double(ptr, ymin);
+
+	if(npoints==2) // LINESTRING
+	{
+		/* Point 1 */
+		ptr = wkb_set_double(ptr, xmax);
+		ptr = wkb_set_double(ptr, ymax);
+	}
+	else if(npoints==5) // POLYGON
+	{
+		/* Point 1 */
+		ptr = wkb_set_double(ptr, xmin);
+		ptr = wkb_set_double(ptr, ymax);
+
+		/* Point 2 */
+		ptr = wkb_set_double(ptr, xmax);
+		ptr = wkb_set_double(ptr, ymax);
+
+		/* Point 3 */
+		ptr = wkb_set_double(ptr, xmax);
+		ptr = wkb_set_double(ptr, ymin);
+
+		/* Point 4 */
+		ptr = wkb_set_double(ptr, xmin);
+		ptr = wkb_set_double(ptr, ymin);
+	}
+
+	return wkb;
+}
+
+PCBOX3D *
+pc_bounds_to_box3d(const PCBOUNDS *bounds, uint32_t srid)
+{
+	PCBOX3D *box = (PCBOX3D *) pcalloc(sizeof(PCBOX3D));
+	box->xmin = bounds->xmin;
+	box->ymin = bounds->ymin;
+	box->zmin = bounds->zmin;
+	box->xmax = bounds->xmax;
+	box->ymax = bounds->ymax;
+	box->zmax = bounds->zmax;
+	box->srid = srid;
+	return box;
+}

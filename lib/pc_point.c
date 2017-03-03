@@ -330,6 +330,9 @@ pc_point_to_geometry_wkb(const PCPOINT *pt, size_t *wkbsize)
 	uint32_t srid = pt->schema->srid;
 	double x, y, z, m;
 
+	if (pt->schema->x_position < 0 || pt->schema->y_position < 0 )
+		return NULL;
+
 	if ( srid != 0 )
 	{
 		wkbtype |= srid_mask;
@@ -380,7 +383,7 @@ pc_point_to_geometry_wkb(const PCPOINT *pt, size_t *wkbsize)
 
 	if ( pt->schema->m_position > -1 )
 	{
-		m = pc_point_get_z(pt);
+		m = pc_point_get_m(pt);
 		memcpy(ptr, &m, 8); /* M */
 		ptr += 8;
 	}

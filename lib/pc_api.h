@@ -150,7 +150,18 @@ typedef struct
 	double xmax;
 	double ymin;
 	double ymax;
+	double zmin;
+	double zmax;
+	double mmin;
+	double mmax;
 } PCBOUNDS;
+
+typedef struct
+{
+	double xmin, ymin, zmin;
+	double xmax, ymax, zmax;
+	int32_t srid;
+} PCBOX3D;
 
 /* Used for generic patch statistics */
 typedef struct
@@ -436,6 +447,12 @@ int pc_patch_compute_extent(PCPATCH *patch);
 
 /** True/false if bounds intersect */
 int pc_bounds_intersects(const PCBOUNDS *b1, const PCBOUNDS *b2);
+
+/** Return the bounds as an OGC WKB geometry */
+uint8_t *pc_bounds_to_geometry_wkb(const PCBOUNDS *bounds, uint32_t srid, size_t *wkbsize);
+
+/** Return the bounds as a BOX3D */
+PCBOX3D *pc_bounds_to_box3d(const PCBOUNDS *bounds, uint32_t srid);
 
 /** Subset batch based on less-than condition on dimension */
 PCPATCH* pc_patch_filter_lt_by_name(const PCPATCH *pa, const char *name, double val);

@@ -1,6 +1,7 @@
 # pointcloud postgis integration extension
 comment = 'integration for pointcloud LIDAR data and PostGIS geometry data'
-default_version = '1.0'
+default_version = '@POINTCLOUD_VERSION@'
+module_pathname = '$libdir/pointcloud-@POINTCLOUD_VERSION_MAJOR@'
 relocatable = true
 superuser = false
 requires = 'postgis, pointcloud'

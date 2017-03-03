@@ -57,4 +57,4 @@ $(EXTENSION)--%--$(EXTVERSION).sql: $(EXTENSION)--$(EXTVERSION).sql ../util/proc
 	cat $< | ../util/proc_upgrade.pl > $@
 
 $(EXTENSION)--%--$(EXTVERSION)next.sql: $(EXTENSION)--$(EXTVERSION)next--$(EXTVERSION).sql
-	ln -f $< $@
+	cp $< $@
