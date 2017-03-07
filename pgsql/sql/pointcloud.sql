@@ -253,8 +253,8 @@ DELETE FROM pa_test_dim;
 INSERT INTO pa_test_dim (pa)
 SELECT PC_Patch(PC_MakePoint(3, ARRAY[x,y,z,intensity]))
 FROM (
- SELECT  
- -127+a/100.0 AS x, 
+ SELECT
+ -127+a/100.0 AS x,
    45+a/100.0 AS y,
         1.0*a AS z,
          a/10 AS intensity,
@@ -276,12 +276,6 @@ SELECT PC_Get(PC_PatchAvg(pa)) FROM pa_test_dim order by 1 limit 1;
 
 
 SELECT PC_Summary(pa) summary FROM pa_test_dim order by 1 limit 1;
-
-CREATE EXTENSION postgis;
-CREATE EXTENSION pointcloud_postgis;
-SELECT st_astext(geometry(pa)),st_astext(PC_FrustumAsGeom(pa)) FROM pa_test_dim;
-
---SELECT PC_Envelope(pa),PC_FrustumAsEWKB(pa) FROM pa_test_dim;
 
 --DROP TABLE pts_collection;
 DROP TABLE pt_test;

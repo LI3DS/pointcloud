@@ -326,38 +326,6 @@ CREATE OR REPLACE FUNCTION PC_SetPCID(p pcpatch, pcid int4)
 	RETURNS pcpatch AS 'MODULE_PATHNAME', 'pcpatch_setpcid'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION PC_RotateQuaternion(p pcpatch, qw float8, qx float8, qy float8, qz float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
-	RETURNS pcpatch AS 'MODULE_PATHNAME', 'pcpatch_rotate_quaternion'
-	LANGUAGE 'c' IMMUTABLE STRICT;
-
-CREATE OR REPLACE FUNCTION PC_RotateQuaternion(p pcpoint, qw float8, qx float8, qy float8, qz float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
-	RETURNS pcpoint AS 'MODULE_PATHNAME', 'pcpoint_rotate_quaternion'
-	LANGUAGE 'c' IMMUTABLE STRICT;
-
-CREATE OR REPLACE FUNCTION PC_Translate(p pcpatch, tx float8, ty float8, tz float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
-	RETURNS pcpatch AS 'MODULE_PATHNAME', 'pcpatch_translate'
-	LANGUAGE 'c' IMMUTABLE STRICT;
-
-CREATE OR REPLACE FUNCTION PC_Translate(p pcpoint, tx float8, ty float8, tz float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
-	RETURNS pcpoint AS 'MODULE_PATHNAME', 'pcpoint_translate'
-	LANGUAGE 'c' IMMUTABLE STRICT;
-
-CREATE OR REPLACE FUNCTION PC_Affine(p pcpatch, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, xoff float8, yoff float8, zoff float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
-	RETURNS pcpatch AS 'MODULE_PATHNAME', 'pcpatch_affine'
-	LANGUAGE 'c' IMMUTABLE STRICT;
-
-CREATE OR REPLACE FUNCTION PC_Affine(p pcpoint, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, xoff float8, yoff float8, zoff float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
-	RETURNS pcpoint AS 'MODULE_PATHNAME', 'pcpoint_affine'
-	LANGUAGE 'c' IMMUTABLE STRICT;
-
-CREATE OR REPLACE FUNCTION PC_Projective(pa pcpatch, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, j float8, k float8, l float8, m float8, n float8, o float8, p float8, xdimname text, ydimname text, zdimname text)
-	RETURNS pcpatch AS 'MODULE_PATHNAME', 'pcpatch_projective'
-	LANGUAGE 'c' IMMUTABLE STRICT;
-
-CREATE OR REPLACE FUNCTION PC_Projective(pa pcpoint, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, j float8, k float8, l float8, m float8, n float8, o float8, p float8, xdimname text, ydimname text, zdimname text)
-	RETURNS pcpoint AS 'MODULE_PATHNAME', 'pcpoint_projective'
-	LANGUAGE 'c' IMMUTABLE STRICT;
-
 -------------------------------------------------------------------
 --  POINTCLOUD_COLUMNS
 -------------------------------------------------------------------
@@ -493,9 +461,41 @@ CREATE OR REPLACE FUNCTION PC_Explode(p pcpatch)
 -------------------------------------------------------------------
 
 -------------------------------------------------------------------
---  Frustum Functions
+-- LI3DS
 -------------------------------------------------------------------
 
+CREATE OR REPLACE FUNCTION PC_RotateQuaternion(p pcpatch, qw float8, qx float8, qy float8, qz float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
+	RETURNS pcpatch AS 'MODULE_PATHNAME', 'lipatch_rotate_quaternion'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_RotateQuaternion(p pcpoint, qw float8, qx float8, qy float8, qz float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
+	RETURNS pcpoint AS 'MODULE_PATHNAME', 'lipoint_rotate_quaternion'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_Translate(p pcpatch, tx float8, ty float8, tz float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
+	RETURNS pcpatch AS 'MODULE_PATHNAME', 'lipatch_translate'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_Translate(p pcpoint, tx float8, ty float8, tz float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
+	RETURNS pcpoint AS 'MODULE_PATHNAME', 'lipoint_translate'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_Affine(p pcpatch, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, xoff float8, yoff float8, zoff float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
+	RETURNS pcpatch AS 'MODULE_PATHNAME', 'lipatch_affine'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_Affine(p pcpoint, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, xoff float8, yoff float8, zoff float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
+	RETURNS pcpoint AS 'MODULE_PATHNAME', 'lipoint_affine'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_Projective(pa pcpatch, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, j float8, k float8, l float8, m float8, n float8, o float8, p float8, xdimname text, ydimname text, zdimname text)
+	RETURNS pcpatch AS 'MODULE_PATHNAME', 'lipatch_projective'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_Projective(pa pcpoint, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, j float8, k float8, l float8, m float8, n float8, o float8, p float8, xdimname text, ydimname text, zdimname text)
+	RETURNS pcpoint AS 'MODULE_PATHNAME', 'lipoint_projective'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION PC_FrustumAsEWKB(p pcpatch)
-	RETURNS bytea AS 'MODULE_PATHNAME', 'pcfrustum_from_patch_as_bytea'
+	RETURNS bytea AS 'MODULE_PATHNAME', 'lifrustum_from_patch_as_bytea'
 	LANGUAGE 'c' IMMUTABLE STRICT;

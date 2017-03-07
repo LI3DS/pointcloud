@@ -32,7 +32,6 @@ Datum pcpoint_as_text(PG_FUNCTION_ARGS);
 Datum pcpatch_as_text(PG_FUNCTION_ARGS);
 Datum pcpoint_as_bytea(PG_FUNCTION_ARGS);
 Datum pcpatch_bytea_envelope(PG_FUNCTION_ARGS);
-Datum pcfrustum_from_patch_as_bytea(PG_FUNCTION_ARGS);
 
 
 static void
@@ -304,37 +303,6 @@ Datum pcpatch_bytea_envelope(PG_FUNCTION_ARGS)
 	PCSCHEMA *schema = pc_schema_from_pcid(serpatch->pcid, fcinfo);
 
 	bytes = pc_patch_to_geometry_wkb_envelope(serpatch, schema, &bytes_size);
-	wkb_size = VARHDRSZ + bytes_size;
-	wkb = palloc(wkb_size);
-	memcpy(VARDATA(wkb), bytes, bytes_size);
-	SET_VARSIZE(wkb, wkb_size);
-
-	pfree(bytes);
-
-	PG_RETURN_BYTEA_P(wkb);
-}
-
-PG_FUNCTION_INFO_V1(pcfrustum_from_patch_as_bytea);
-Datum pcfrustum_from_patch_as_bytea(PG_FUNCTION_ARGS)
-{
-	uint8 *bytes;
-	size_t bytes_size;
-	bytea *wkb;
-	size_t wkb_size;
-	SERIALIZED_PATCH *serpatch = PG_GETHEADER_SERPATCH_P(0);
-
-	// TODO: use directly PCBOUNDS when it will be 3D
-	PCBOUNDS *b = & serpatch->bounds;
-	const PCBOX3 box = {
-		{ b->xmin, b->ymin, 0 },
-		{ b->xmax, b->ymax, 10 }
-	};
-
-	PCFRUSTUM f;
-	uint32_t srid = 0;
-
-	pc_frustum_from_box(&f,box);
-	bytes = pc_frustum_to_geometry_wkb(&f, srid, &bytes_size);
 	wkb_size = VARHDRSZ + bytes_size;
 	wkb = palloc(wkb_size);
 	memcpy(VARDATA(wkb), bytes, bytes_size);

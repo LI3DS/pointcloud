@@ -2,9 +2,13 @@
 
 set ( PC_SOURCES
   pc_access.c 
-  pc_editor.c
   pc_inout.c      
   pc_pgsql.c       
+  )
+
+set ( LI_SOURCES
+  li_editor.c
+  li_inout.c
   )
 
 set ( PC_HEADERS
@@ -32,7 +36,7 @@ set(CMAKE_SHARED_LINKER_FLAGS "${PGSQL_LDFLAGS}")
 include_directories ("${PGSQL_INCLUDEDIR_SERVER}")
 include_directories ("${PROJECT_SOURCE_DIR}/lib")
 
-add_library (pointcloud MODULE ${PC_SOURCES} ${PC_HEADERS})
+add_library (pointcloud MODULE ${PC_SOURCES} ${LI_SOURCES} ${PC_HEADERS})
 
 target_link_libraries (pointcloud libpc-static)
 

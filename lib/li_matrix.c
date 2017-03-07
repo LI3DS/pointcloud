@@ -1,7 +1,8 @@
 /***********************************************************************
-* pc_matrix.c
+* li_matrix.c
 *
 *  Simple matrix library.
+*
 *  Allow this library to be used both inside and outside a
 *  PgSQL backend.
 *
@@ -11,13 +12,14 @@
 ***********************************************************************/
 
 #include "pc_api_internal.h"
+#include "li_api_internal.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <assert.h>
 
 
-void pc_matrix_44_warn(const char *func, int line, const char *name, const PCMAT44 m)
+void li_matrix_44_warn(const char *func, int line, const char *name, const LIMAT44 m)
 {
 	pcwarn("%s:%d %s=\n%lf %lf %lf %lf\n%lf %lf %lf %lf\n%lf %lf %lf %lf\n%lf %lf %lf %lf\n",
 		func, line, name,
@@ -27,12 +29,12 @@ void pc_matrix_44_warn(const char *func, int line, const char *name, const PCMAT
 		m[12], m[13], m[14], m[15]);
 }
 
-void pc_vector_3_warn(const char *func, int line, const char *name, const PCVEC4 v)
+void li_vector_3_warn(const char *func, int line, const char *name, const LIVEC4 v)
 {
 	pcwarn("%s:%d %s=%lf %lf %lf", func, line, name, v[0], v[1], v[2]);
 }
 
-void pc_vector_4_warn(const char *func, int line, const char *name, const PCVEC4 v)
+void li_vector_4_warn(const char *func, int line, const char *name, const LIVEC4 v)
 {
 	pcwarn("%s:%d %s=%lf %lf %lf %lf", func, line, name, v[0], v[1], v[2], v[3]);
 }
@@ -41,7 +43,7 @@ void pc_vector_4_warn(const char *func, int line, const char *name, const PCVEC4
 * Set a 4x3 matrix (4 columns, 3 lines)
 */
 void
-pc_matrix_43_set(PCMAT43 mat,
+li_matrix_43_set(LIMAT43 mat,
 		double a, double b, double c, double d,
 		double e, double f, double g, double h,
 		double i, double j, double k, double l)
@@ -57,7 +59,7 @@ pc_matrix_43_set(PCMAT43 mat,
 * Set a 4x4 matrix (4 columns, 4 lines)
 */
 void
-pc_matrix_44_copy(PCMAT44 res, const PCMAT44 mat)
+li_matrix_44_copy(LIMAT44 res, const LIMAT44 mat)
 {
 	memcpy(res, mat, 16*sizeof(double));
 }
@@ -66,13 +68,13 @@ pc_matrix_44_copy(PCMAT44 res, const PCMAT44 mat)
 * Set a 3 vector
 */
 void
-pc_vector_3_copy(PCVEC3 res, const PCVEC3 vec)
+li_vector_3_copy(LIVEC3 res, const LIVEC3 vec)
 {
 	memcpy(res, vec, 3*sizeof(double));
 }
 
 void
-pc_vector_3_cross(PCVEC3 res, const PCVEC3 v0, const PCVEC3 v1)
+li_vector_3_cross(LIVEC3 res, const LIVEC3 v0, const LIVEC3 v1)
 {
 	res[0] = v0[1]*v1[2] - v0[2]*v1[1];
 	res[1] = v0[2]*v1[0] - v0[0]*v1[2];
@@ -80,13 +82,13 @@ pc_vector_3_cross(PCVEC3 res, const PCVEC3 v0, const PCVEC3 v1)
 }
 
 double
-pc_vector_3_dot(const PCVEC3 v0, const PCVEC3 v1)
+li_vector_3_dot(const LIVEC3 v0, const LIVEC3 v1)
 {
 	return v0[0]*v1[0] + v0[1]*v1[1] + v0[2]*v1[2];
 }
 
 void
-pc_vector_3_abs(PCVEC3 res, const PCVEC3 vec)
+li_vector_3_abs(LIVEC3 res, const LIVEC3 vec)
 {
 	res[0] = fabs(vec[0]);
 	res[1] = fabs(vec[1]);
@@ -97,7 +99,7 @@ pc_vector_3_abs(PCVEC3 res, const PCVEC3 vec)
 * Set a 4x4 matrix.
 */
 void
-pc_matrix_44_set(PCMAT44 mat,
+li_matrix_44_set(LIMAT44 mat,
 		double a, double b, double c, double d,
 		double e, double f, double g, double h,
 		double i, double j, double k, double l,
@@ -115,7 +117,7 @@ pc_matrix_44_set(PCMAT44 mat,
 * that the quaternion is a unit quaternion.
 */
 void
-pc_matrix_33_set_from_quaternion(PCMAT33 mat,
+li_matrix_33_set_from_quaternion(LIMAT33 mat,
 		double qw, double qx, double qy, double qz)
 {
 	double x = qx+qx;
@@ -149,7 +151,7 @@ pc_matrix_33_set_from_quaternion(PCMAT33 mat,
 * Multiply mat by vec and store the resuting vector in res.
 */
 void
-pc_matrix_33_multiply_vector_3(PCVEC3 res, const PCMAT33 mat, const PCVEC3 vec)
+li_matrix_33_multiply_vector_3(LIVEC3 res, const LIMAT33 mat, const LIVEC3 vec)
 {
 	res[0] = mat[0] * vec[0] + mat[1] * vec[1] + mat[2] * vec[2];
 	res[1] = mat[3] * vec[0] + mat[4] * vec[1] + mat[5] * vec[2];
@@ -160,7 +162,7 @@ pc_matrix_33_multiply_vector_3(PCVEC3 res, const PCMAT33 mat, const PCVEC3 vec)
 * Multiply mat by vec and store the resuting vector in res.
 */
 void
-pc_matrix_44_multiply_vector_3(PCVEC4 res, const PCMAT44 mat, const PCVEC3 vec)
+li_matrix_44_multiply_vector_3(LIVEC4 res, const LIMAT44 mat, const LIVEC3 vec)
 {
 	res[0] = mat[ 0] * vec[0] + mat[ 1] * vec[1] + mat[ 2] * vec[2] + mat[ 3];
 	res[1] = mat[ 4] * vec[0] + mat[ 5] * vec[1] + mat[ 6] * vec[2] + mat[ 7];
@@ -172,7 +174,7 @@ pc_matrix_44_multiply_vector_3(PCVEC4 res, const PCMAT44 mat, const PCVEC3 vec)
 * Multiply mat by vec and store the resuting vector in res.
 */
 void
-pc_matrix_44_multiply_vector_4(PCVEC4 res, const PCMAT44 mat, const PCVEC4 vec)
+li_matrix_44_multiply_vector_4(LIVEC4 res, const LIMAT44 mat, const LIVEC4 vec)
 {
 	res[0] = mat[ 0] * vec[0] + mat[ 1] * vec[1] + mat[ 2] * vec[2] + mat[ 3] * vec[3];
 	res[1] = mat[ 4] * vec[0] + mat[ 5] * vec[1] + mat[ 6] * vec[2] + mat[ 7] * vec[3];
@@ -185,7 +187,7 @@ pc_matrix_44_multiply_vector_4(PCVEC4 res, const PCMAT44 mat, const PCVEC4 vec)
 * vector in res.
 */
 void
-pc_matrix_43_transform_affine(PCVEC3 res, const PCMAT43 mat, const PCVEC3 vec)
+li_matrix_43_transform_affine(LIVEC3 res, const LIMAT43 mat, const LIVEC3 vec)
 {
 	res[0] = mat[0] * vec[0] + mat[1] * vec[1] + mat[ 2] * vec[2] + mat[ 3];
 	res[1] = mat[4] * vec[0] + mat[5] * vec[1] + mat[ 6] * vec[2] + mat[ 7];
@@ -196,21 +198,21 @@ pc_matrix_43_transform_affine(PCVEC3 res, const PCMAT43 mat, const PCVEC3 vec)
 * Multiply mat by vec and store the resuting vector in res.
 */
 void
-pc_matrix_44_multiply_matrix_44(PCMAT44 res, const PCMAT44 mat1, const PCMAT44 mat2)
+li_matrix_44_multiply_matrix_44(LIMAT44 res, const LIMAT44 mat1, const LIMAT44 mat2)
 {
-	PCMAT44 t;
-	pc_matrix_44_transpose(t,mat2);
-	pc_matrix_44_multiply_vector_4(res   ,t,mat1   );
-	pc_matrix_44_multiply_vector_4(res+ 4,t,mat1+ 4);
-	pc_matrix_44_multiply_vector_4(res+ 8,t,mat1+ 8);
-	pc_matrix_44_multiply_vector_4(res+12,t,mat1+12);
+	LIMAT44 t;
+	li_matrix_44_transpose(t,mat2);
+	li_matrix_44_multiply_vector_4(res   ,t,mat1   );
+	li_matrix_44_multiply_vector_4(res+ 4,t,mat1+ 4);
+	li_matrix_44_multiply_vector_4(res+ 8,t,mat1+ 8);
+	li_matrix_44_multiply_vector_4(res+12,t,mat1+12);
 }
 
 /**
 * Multiply mat by vec and store the resuting vector in res.
 */
 void
-pc_matrix_44_transpose(PCMAT44 res, const PCMAT44 mat)
+li_matrix_44_transpose(LIMAT44 res, const LIMAT44 mat)
 {
 	res[ 0] = mat[0]; res[ 1] = mat[4]; res[ 2] = mat[ 8]; res[ 3] = mat[12];
 	res[ 4] = mat[1]; res[ 5] = mat[5]; res[ 6] = mat[ 9]; res[ 7] = mat[13];
@@ -219,7 +221,7 @@ pc_matrix_44_transpose(PCMAT44 res, const PCMAT44 mat)
 }
 
 void
-pc_matrix_44_multiply(PCMAT44 res, const PCMAT44 mat, double v)
+li_matrix_44_multiply(LIMAT44 res, const LIMAT44 mat, double v)
 {
 	int i;
 	for( i = 0; i < 16; ++i)
@@ -227,7 +229,7 @@ pc_matrix_44_multiply(PCMAT44 res, const PCMAT44 mat, double v)
 }
 
 void
-pc_matrix_44_plucker(double v[6], const PCMAT44 m)
+li_matrix_44_plucker(double v[6], const LIMAT44 m)
 {
 	double m00 = m[ 0], m10 = m[ 1];
 	double m01 = m[ 4], m11 = m[ 5];
@@ -243,12 +245,12 @@ pc_matrix_44_plucker(double v[6], const PCMAT44 m)
 }
 
 double
-pc_matrix_44_determinant(const PCMAT44 m)
+li_matrix_44_determinant(const LIMAT44 m)
 {
 	double p[6];
 	double q[6];
-	pc_matrix_44_plucker(p,m  ); // 2 left  columns
-	pc_matrix_44_plucker(q,m+2); // 2 right columns
+	li_matrix_44_plucker(p,m  ); // 2 left  columns
+	li_matrix_44_plucker(q,m+2); // 2 right columns
 	return p[0]*q[3] - p[1]*q[4] + p[2]*q[5] + p[3]*q[0] - p[4]*q[1] + p[5]*q[2];
 }
 
@@ -258,12 +260,12 @@ pc_matrix_44_determinant(const PCMAT44 m)
 * and may be used in place of the inverse in homogeneous contexts.
 */
 void
-pc_matrix_44_adjugate(PCMAT44 res, const PCMAT44 m, double *determinant)
+li_matrix_44_adjugate(LIMAT44 res, const LIMAT44 m, double *determinant)
 {
 	double p[6];
 	double q[6];
-	pc_matrix_44_plucker(p,m  ); // 2 left  columns
-	pc_matrix_44_plucker(q,m+2); // 2 right columns
+	li_matrix_44_plucker(p,m  ); // 2 left  columns
+	li_matrix_44_plucker(q,m+2); // 2 right columns
 
 	res[ 0] = m[5]*q[5]-m[ 9]*q[4]+m[13]*q[0];
 	res[ 4] =-m[4]*q[5]+m[ 8]*q[4]-m[12]*q[0];
@@ -293,18 +295,18 @@ pc_matrix_44_adjugate(PCMAT44 res, const PCMAT44 m, double *determinant)
 * inverse matrix (could be optimized)
 */
 int
-pc_matrix_44_inverse(PCMAT44 res, const PCMAT44 mat)
+li_matrix_44_inverse(LIMAT44 res, const LIMAT44 mat)
 {
 	double det;
-	pc_matrix_44_adjugate(res,mat,&det);
+	li_matrix_44_adjugate(res,mat,&det);
 	if(det == 0)
 		return PC_FAILURE;
-	pc_matrix_44_multiply(res,res,1./det);
+	li_matrix_44_multiply(res,res,1./det);
 	return PC_SUCCESS;
 }
 
 void
-pc_vector_3_add(PCVEC3 res, const PCVEC3 v1, const PCVEC3 v2)
+li_vector_3_add(LIVEC3 res, const LIVEC3 v1, const LIVEC3 v2)
 {
 	res[0] = v1[0] + v2[0];
 	res[1] = v1[1] + v2[1];
@@ -312,7 +314,7 @@ pc_vector_3_add(PCVEC3 res, const PCVEC3 v1, const PCVEC3 v2)
 }
 
 void
-pc_vector_3_sub(PCVEC3 res, const PCVEC3 v1, const PCVEC3 v2)
+li_vector_3_sub(LIVEC3 res, const LIVEC3 v1, const LIVEC3 v2)
 {
 	res[0] = v1[0] - v2[0];
 	res[1] = v1[1] - v2[1];
@@ -320,7 +322,7 @@ pc_vector_3_sub(PCVEC3 res, const PCVEC3 v1, const PCVEC3 v2)
 }
 
 void
-pc_vector_3_min(PCVEC3 res, const PCVEC3 v1, const PCVEC3 v2)
+li_vector_3_min(LIVEC3 res, const LIVEC3 v1, const LIVEC3 v2)
 {
 	res[0] = fmin(v1[0],v2[0]);
 	res[1] = fmin(v1[1],v2[1]);
@@ -328,7 +330,7 @@ pc_vector_3_min(PCVEC3 res, const PCVEC3 v1, const PCVEC3 v2)
 }
 
 void
-pc_vector_3_max(PCVEC3 res, const PCVEC3 v1, const PCVEC3 v2)
+li_vector_3_max(LIVEC3 res, const LIVEC3 v1, const LIVEC3 v2)
 {
 	res[0] = fmax(v1[0],v2[0]);
 	res[1] = fmax(v1[1],v2[1]);
@@ -336,7 +338,7 @@ pc_vector_3_max(PCVEC3 res, const PCVEC3 v1, const PCVEC3 v2)
 }
 
 void
-pc_vector_4_add(PCVEC4 res, const PCVEC4 v1, const PCVEC4 v2)
+li_vector_4_add(LIVEC4 res, const LIVEC4 v1, const LIVEC4 v2)
 {
 	res[0] = v1[0] + v2[0];
 	res[1] = v1[1] + v2[1];
@@ -345,7 +347,7 @@ pc_vector_4_add(PCVEC4 res, const PCVEC4 v1, const PCVEC4 v2)
 }
 
 void
-pc_vector_4_sub(PCVEC4 res, const PCVEC4 v1, const PCVEC4 v2)
+li_vector_4_sub(LIVEC4 res, const LIVEC4 v1, const LIVEC4 v2)
 {
 	res[0] = v1[0] - v2[0];
 	res[1] = v1[1] - v2[1];
@@ -354,7 +356,7 @@ pc_vector_4_sub(PCVEC4 res, const PCVEC4 v1, const PCVEC4 v2)
 }
 
 int
-pc_vector_3_from_homogeneous(PCVEC3 res, const PCVEC4 v)
+li_vector_3_from_homogeneous(LIVEC3 res, const LIVEC4 v)
 {
 	if(v[3]==0) return PC_FAILURE;
 	res[0] = v[0] / v[3];
@@ -363,12 +365,12 @@ pc_vector_3_from_homogeneous(PCVEC3 res, const PCVEC4 v)
 	return PC_SUCCESS;
 }
 
-#define PCVEC2MID(x,y) 0.5*((x)[0]+(y)[0]), 0.5*((x)[1]+(y)[1])
-#define PCVEC3SUB(x,y) (x)[0]-(y)[0], (x)[1]-(y)[1], (x)[2]-(y)[2]
-#define PCVEC3ADD(x,y) (x)[0]+(y)[0], (x)[1]+(y)[1], (x)[2]+(y)[2]
-#define PCVEC4SUB(x,y) (x)[0]-(y)[0], (x)[1]-(y)[1], (x)[2]-(y)[2], (x)[3]-(y)[3]
-#define PCVEC4ADD(x,y) (x)[0]+(y)[0], (x)[1]+(y)[1], (x)[2]+(y)[2], (x)[3]+(y)[3]
-#define PCBOX3CORNERS(b) \
+#define LIVEC2MID(x,y) 0.5*((x)[0]+(y)[0]), 0.5*((x)[1]+(y)[1])
+#define LIVEC3SUB(x,y) (x)[0]-(y)[0], (x)[1]-(y)[1], (x)[2]-(y)[2]
+#define LIVEC3ADD(x,y) (x)[0]+(y)[0], (x)[1]+(y)[1], (x)[2]+(y)[2]
+#define LIVEC4SUB(x,y) (x)[0]-(y)[0], (x)[1]-(y)[1], (x)[2]-(y)[2], (x)[3]-(y)[3]
+#define LIVEC4ADD(x,y) (x)[0]+(y)[0], (x)[1]+(y)[1], (x)[2]+(y)[2], (x)[3]+(y)[3]
+#define LIBOX3CORNERS(b) \
 	{ b[0][0], b[0][1], b[0][2] }, \
 	{ b[1][0], b[0][1], b[0][2] }, \
 	{ b[0][0], b[1][1], b[0][2] }, \
@@ -391,66 +393,66 @@ pc_vector_3_from_homogeneous(PCVEC3 res, const PCVEC4 v)
 *     [  1 ,  1,  1 ]
 * }
 */
-int pc_frustum_get_points(PCVEC3 res[8], const PCMAT44 fwd)
+int li_frustum_get_points(LIVEC3 res[8], const LIMAT44 fwd)
 {
-	PCMAT44 m;
-	PCVEC4 v[8];
+	LIMAT44 m;
+	LIVEC4 v[8];
 	int i;
-	pc_matrix_44_transpose(m,fwd);
-	pc_vector_4_add(v[1], m+12, m);
-	pc_vector_4_sub(v[0], m+12, m);
+	li_matrix_44_transpose(m,fwd);
+	li_vector_4_add(v[1], m+12, m);
+	li_vector_4_sub(v[0], m+12, m);
 
-	pc_vector_4_add(v[2], v[0], m+4);
-	pc_vector_4_add(v[3], v[1], m+4);
+	li_vector_4_add(v[2], v[0], m+4);
+	li_vector_4_add(v[3], v[1], m+4);
 
-	pc_vector_4_sub(v[0], v[0], m+4);
-	pc_vector_4_sub(v[1], v[1], m+4);
+	li_vector_4_sub(v[0], v[0], m+4);
+	li_vector_4_sub(v[1], v[1], m+4);
 
-	pc_vector_4_add(v[4], v[0], m+8);
-	pc_vector_4_add(v[5], v[1], m+8);
-	pc_vector_4_add(v[6], v[2], m+8);
-	pc_vector_4_add(v[7], v[3], m+8);
+	li_vector_4_add(v[4], v[0], m+8);
+	li_vector_4_add(v[5], v[1], m+8);
+	li_vector_4_add(v[6], v[2], m+8);
+	li_vector_4_add(v[7], v[3], m+8);
 
-	pc_vector_4_sub(v[0], v[0], m+8);
-	pc_vector_4_sub(v[1], v[1], m+8);
-	pc_vector_4_sub(v[2], v[2], m+8);
-	pc_vector_4_sub(v[3], v[3], m+8);
+	li_vector_4_sub(v[0], v[0], m+8);
+	li_vector_4_sub(v[1], v[1], m+8);
+	li_vector_4_sub(v[2], v[2], m+8);
+	li_vector_4_sub(v[3], v[3], m+8);
 
 	for( i = 0; i < 8; ++i )
 	{
-		if(!pc_vector_3_from_homogeneous(res[i],v[i]))
+		if(!li_vector_3_from_homogeneous(res[i],v[i]))
 			return PC_FAILURE;
 	}
 	return PC_SUCCESS;
 }
 
 int
-pc_box_from_vector_3_array(PCBOX3 res,  PCVEC3 * const p, size_t n)
+li_box_from_vector_3_array(LIBOX3 res,  LIVEC3 * const p, size_t n)
 {
 	int i;
 	if (n==0)
 		return PC_FAILURE;
-	pc_vector_3_copy(res[0],p[0]);
-	pc_vector_3_copy(res[1],p[0]);
+	li_vector_3_copy(res[0],p[0]);
+	li_vector_3_copy(res[1],p[0]);
 	for( i = 1; i < n; ++i )
 	{
-		pc_vector_3_min(res[0],res[0],p[i]);
-		pc_vector_3_max(res[1],res[1],p[i]);
+		li_vector_3_min(res[0],res[0],p[i]);
+		li_vector_3_max(res[1],res[1],p[i]);
 	}
 	return PC_SUCCESS;
 }
 
 /*
-* PCFRUSTUM <-> PCBOX3 conversions
+* LIFRUSTUM <-> LIBOX3 conversions
 */
 
 /** convert a box to a frustum (lossless) */
 int
-pc_frustum_from_box(PCFRUSTUM *res, const PCBOX3 b)
+li_frustum_from_box(LIFRUSTUM *res, const LIBOX3 b)
 {
-	PCVEC3 s = { PCVEC3SUB(b[1],b[0]) };
-	PCVEC3 c = { PCVEC3ADD(b[0],b[1]) };
-	PCVEC3 v = { s[1]*s[2], s[0]*s[2], s[0]*s[1] };
+	LIVEC3 s = { LIVEC3SUB(b[1],b[0]) };
+	LIVEC3 c = { LIVEC3ADD(b[0],b[1]) };
+	LIVEC3 v = { s[1]*s[2], s[0]*s[2], s[0]*s[1] };
 	double vol = s[0]*v[0]; // s0*s1*s2
 
 	double fwd[] = {
@@ -459,7 +461,7 @@ pc_frustum_from_box(PCFRUSTUM *res, const PCBOX3 b)
 		0,  0,  s[2], c[2],
 		0,  0,  0,  2
 	};
-	pc_matrix_44_copy(res->fwd, fwd );
+	li_matrix_44_copy(res->fwd, fwd );
 
 	double bwd[] = {
 		2*v[0], 0, 0, -v[0]*c[0],
@@ -468,7 +470,7 @@ pc_frustum_from_box(PCFRUSTUM *res, const PCBOX3 b)
 		0, 0, 0, vol
 	};
 	res->bwd = pcalloc(16*sizeof(double));
-	pc_matrix_44_copy(res->bwd, bwd );
+	li_matrix_44_copy(res->bwd, bwd );
 
 	res->det = 2*vol;
 	return PC_SUCCESS;
@@ -476,10 +478,10 @@ pc_frustum_from_box(PCFRUSTUM *res, const PCBOX3 b)
 
 /** convert a frustum to a box (lossy if not axis-aligned) */
 int
-pc_box_from_frustum(PCBOX3 res, const PCFRUSTUM *f)
+li_box_from_frustum(LIBOX3 res, const LIFRUSTUM *f)
 {
-	PCVEC3 p[8];
-	return pc_frustum_get_points(p,f->fwd) && pc_box_from_vector_3_array(res,p,8);
+	LIVEC3 p[8];
+	return li_frustum_get_points(p,f->fwd) && li_box_from_vector_3_array(res,p,8);
 }
 
 /**
@@ -487,39 +489,39 @@ pc_box_from_frustum(PCBOX3 res, const PCFRUSTUM *f)
 * vector in res.
 */
 int
-pc_matrix_44_transform_projective_vector_3(PCVEC3 res, const PCMAT44 mat, const PCVEC3 vec)
+li_matrix_44_transform_projective_vector_3(LIVEC3 res, const LIMAT44 mat, const LIVEC3 vec)
 {
-	PCVEC4 hres;
-	pc_matrix_44_multiply_vector_3(hres,mat,vec);
-	return pc_vector_3_from_homogeneous(res,hres);
+	LIVEC4 hres;
+	li_matrix_44_multiply_vector_3(hres,mat,vec);
+	return li_vector_3_from_homogeneous(res,hres);
 }
 
 int
-pc_matrix_44_transform_projective_vector_4(PCVEC3 res, const PCMAT44 mat, const PCVEC4 vec)
+li_matrix_44_transform_projective_vector_4(LIVEC3 res, const LIMAT44 mat, const LIVEC4 vec)
 {
-	PCVEC4 hres;
-	pc_matrix_44_multiply_vector_4(hres,mat,vec);
-	return pc_vector_3_from_homogeneous(res,hres);
+	LIVEC4 hres;
+	li_matrix_44_multiply_vector_4(hres,mat,vec);
+	return li_vector_3_from_homogeneous(res,hres);
 }
 
 int
-pc_box_projective(PCBOX3 res, const PCMAT44 mat, PCBOX3 b)
+li_box_projective(LIBOX3 res, const LIMAT44 mat, LIBOX3 b)
 {
-	PCVEC3 p[] = { PCBOX3CORNERS(b) };
+	LIVEC3 p[] = { LIBOX3CORNERS(b) };
 	int i;
 	for( i = 0; i < 8; ++i )
 	{
-		if(!pc_matrix_44_transform_projective_vector_3(p[i],mat,p[i]))
+		if(!li_matrix_44_transform_projective_vector_3(p[i],mat,p[i]))
 			return PC_FAILURE;
 	}
-	return pc_box_from_vector_3_array(res,p,8);
+	return li_box_from_vector_3_array(res,p,8);
 }
 
 int
-pc_frustum_projective(PCFRUSTUM *res, const PCFRUSTUM *f,
-	const PCMAT44 fwd)
+li_frustum_projective(LIFRUSTUM *res, const LIFRUSTUM *f,
+	const LIMAT44 fwd)
 {
-	pc_matrix_44_multiply_matrix_44(res->fwd, fwd, f->fwd);
+	li_matrix_44_multiply_matrix_44(res->fwd, fwd, f->fwd);
 	res->bwd = NULL;
 	return PC_SUCCESS;
 }
@@ -529,9 +531,9 @@ pc_frustum_projective(PCFRUSTUM *res, const PCFRUSTUM *f,
 */
 
 int
-pc_vector_3_normalize(PCVEC3 res, const PCVEC3 vec)
+li_vector_3_normalize(LIVEC3 res, const LIVEC3 vec)
 {
-	double r2 = pc_vector_3_dot(vec,vec);
+	double r2 = li_vector_3_dot(vec,vec);
 	if(r2<=0)
 		return PC_FAILURE;
 	double inv = 1/sqrt(r2);
@@ -542,14 +544,14 @@ pc_vector_3_normalize(PCVEC3 res, const PCVEC3 vec)
 }
 
 int
-pc_box_normalize(PCBOX3 res, const PCBOX3 b)
+li_box_normalize(LIBOX3 res, const LIBOX3 b)
 {
 	pcwarn("%s: not implemented yet...", __func__);
 	return PC_FAILURE;
 }
 
 int
-pc_frustum_normalize(PCFRUSTUM *res, const PCFRUSTUM *f)
+li_frustum_normalize(LIFRUSTUM *res, const LIFRUSTUM *f)
 {
 	pcwarn("%s: not implemented yet...", __func__);
 	return PC_FAILURE;
@@ -560,7 +562,7 @@ pc_frustum_normalize(PCFRUSTUM *res, const PCFRUSTUM *f)
 */
 
 int
-pc_vector_3_cartesian_from_spherical(PCVEC3 res, const PCVEC3 vec)
+li_vector_3_cartesian_from_spherical(LIVEC3 res, const LIVEC3 vec)
 {
 	double rc2 = vec[0]*cos(vec[2]);
 	double rs2 = vec[0]*sin(vec[2]);
@@ -571,14 +573,14 @@ pc_vector_3_cartesian_from_spherical(PCVEC3 res, const PCVEC3 vec)
 }
 
 int
-pc_box_cartesian_from_spherical(PCBOX3 res, const PCBOX3 b)
+li_box_cartesian_from_spherical(LIBOX3 res, const LIBOX3 b)
 {
 	pcwarn("%s: not implemented yet...", __func__);
 	return PC_FAILURE;
 }
 
 int
-pc_frustum_cartesian_from_spherical(PCFRUSTUM *res, const PCFRUSTUM *f)
+li_frustum_cartesian_from_spherical(LIFRUSTUM *res, const LIFRUSTUM *f)
 {
 	pcwarn("%s: not implemented yet...", __func__);
 	return PC_FAILURE;
@@ -589,23 +591,23 @@ pc_frustum_cartesian_from_spherical(PCFRUSTUM *res, const PCFRUSTUM *f)
 */
 
 int
-pc_vector_3_spherical_from_cartesian(PCVEC3 res, const PCVEC3 vec)
+li_vector_3_spherical_from_cartesian(LIVEC3 res, const LIVEC3 vec)
 {
-	res[0] = sqrt(pc_vector_3_dot(vec,vec));
+	res[0] = sqrt(li_vector_3_dot(vec,vec));
 	res[1] = atan2(vec[1],vec[0]);
 	res[2] = asin (vec[2]/res[0]);
 	return PC_SUCCESS;
 }
 
 int
-pc_box_spherical_from_cartesian(PCBOX3 res, const PCBOX3 b)
+li_box_spherical_from_cartesian(LIBOX3 res, const LIBOX3 b)
 {
 	pcwarn("%s: not implemented yet...", __func__);
 	return PC_FAILURE;
 }
 
 int
-pc_frustum_spherical_from_cartesian(PCFRUSTUM *res, const PCFRUSTUM *f)
+li_frustum_spherical_from_cartesian(LIFRUSTUM *res, const LIFRUSTUM *f)
 {
 	pcwarn("%s: not implemented yet...", __func__);
 	return PC_FAILURE;
@@ -618,7 +620,7 @@ pc_frustum_spherical_from_cartesian(PCFRUSTUM *res, const PCFRUSTUM *f)
 */
 
 int
-pc_vector_3_distorsion(PCVEC3 res, const PCDISTORSION *d, const PCVEC3 vec)
+li_vector_3_distorsion(LIVEC3 res, const LIDISTORSION *d, const LIVEC3 vec)
 {
 	double v[] = { res[0]-d->pps[0], res[0]-d->pps[1] };
 	double r2 = v[0]*v[0]+v[1]*v[1];
@@ -634,7 +636,7 @@ pc_vector_3_distorsion(PCVEC3 res, const PCDISTORSION *d, const PCVEC3 vec)
 }
 
 int
-pc_box_transform_distorsion(PCBOX3 res, const PCDISTORSION *d, const PCBOX3 b)
+li_box_transform_distorsion(LIBOX3 res, const LIDISTORSION *d, const LIBOX3 b)
 {
 	double c0 = d->c[0], c1 = d->c[1], c2 = d->c[2];
 	// roots (xp,xm) of P' = c0 + 2 c1 X + 3 c2 X^2
@@ -706,7 +708,7 @@ pc_box_transform_distorsion(PCBOX3 res, const PCDISTORSION *d, const PCBOX3 b)
 }
 
 int
-pc_frustum_transform_distorsion(PCFRUSTUM *res, const PCDISTORSION *d, const PCFRUSTUM *f)
+li_frustum_transform_distorsion(LIFRUSTUM *res, const LIDISTORSION *d, const LIFRUSTUM *f)
 {
 	pcwarn("%s: not implemented yet...", __func__);
 	return PC_FAILURE;
@@ -717,10 +719,10 @@ pc_frustum_transform_distorsion(PCFRUSTUM *res, const PCDISTORSION *d, const PCF
 * https://github.com/IGNF/libOri/blob/master/src/DistortionPolynom.cpp
 */
 
-#define PCUNDISTORSION_ERR2MAX (1e-15)
+#define LIUNDISTORSION_ERR2MAX (1e-15)
 
 int
-pc_vector_3_undistorsion(PCVEC3 res, const PCDISTORSION *d, const PCVEC3 vec)
+li_vector_3_undistorsion(LIVEC3 res, const LIDISTORSION *d, const LIVEC3 vec)
 {
 
 	double v[] = { res[0]-d->pps[0], res[0]-d->pps[1] };
@@ -739,7 +741,7 @@ pc_vector_3_undistorsion(PCVEC3 res, const PCDISTORSION *d, const PCVEC3 vec)
 		double t2 = t *t;
 		double R_, R  = -1+t+t*t2*(c3+t2*(c5+t2*c7));
 
-		if(R*R*r2<PCUNDISTORSION_ERR2MAX && t2*r2<d->r2max)
+		if(R*R*r2<LIUNDISTORSION_ERR2MAX && t2*r2<d->r2max)
 		{
 			res[0] = d->pps[0] + t * v[0];
 			res[1] = d->pps[1] + t * v[1];
@@ -754,12 +756,12 @@ pc_vector_3_undistorsion(PCVEC3 res, const PCDISTORSION *d, const PCVEC3 vec)
 }
 
 int
-pc_box_transform_undistorsion(PCBOX3 res, const PCDISTORSION *d, const PCBOX3 b)
+li_box_transform_undistorsion(LIBOX3 res, const LIDISTORSION *d, const LIBOX3 b)
 {
 	pcwarn("%s: current implementation is not conservative (bbox of 8points)...", __func__);
-	double c[2] = { PCVEC2MID(b[0],b[1]) };
-	PCVEC3 q[8];
-	PCVEC3 p[8] = {
+	double c[2] = { LIVEC2MID(b[0],b[1]) };
+	LIVEC3 q[8];
+	LIVEC3 p[8] = {
 		{ b[0][0], b[0][1], b[0][2]},
 		{ b[1][0], b[0][1], b[0][2]},
 		{ b[0][0], b[1][1], b[1][2]},
@@ -771,14 +773,14 @@ pc_box_transform_undistorsion(PCBOX3 res, const PCDISTORSION *d, const PCBOX3 b)
 	};
 	int i;
 	for( i = 0; i < 8; ++i )
-		if(!pc_vector_3_undistorsion(q[i],d,p[i]))
+		if(!li_vector_3_undistorsion(q[i],d,p[i]))
 			return PC_FAILURE;
 
-	return pc_box_from_vector_3_array(res,q,8);
+	return li_box_from_vector_3_array(res,q,8);
 }
 
 int
-pc_frustum_transform_undistorsion(PCFRUSTUM *res, const PCDISTORSION *d, const PCFRUSTUM *f)
+li_frustum_transform_undistorsion(LIFRUSTUM *res, const LIDISTORSION *d, const LIFRUSTUM *f)
 {
 	pcwarn("%s: not implemented yet...", __func__);
 	return PC_FAILURE;
@@ -789,7 +791,7 @@ pc_frustum_transform_undistorsion(PCFRUSTUM *res, const PCDISTORSION *d, const P
 */
 
 uint8_t *
-pc_frustum_corners_to_geometry_wkb( const PCVEC3 p[8], uint32_t srid, size_t *wkbsize)
+li_frustum_corners_to_geometry_wkb( const LIVEC3 p[8], uint32_t srid, size_t *wkbsize)
 {
 	static uint32_t srid_mask = 0x20000000;
 	static uint32_t z_mask = 0x80000000;
@@ -863,22 +865,22 @@ pc_frustum_corners_to_geometry_wkb( const PCVEC3 p[8], uint32_t srid, size_t *wk
 	return wkb;
 }
 
-//should we add a srid to PCBOX3 ?
+//should we add a srid to LIBOX3 ?
 uint8_t *
-pc_box_to_geometry_wkb(const PCBOX3 b, uint32_t srid, size_t *wkbsize)
+li_box_to_geometry_wkb(const LIBOX3 b, uint32_t srid, size_t *wkbsize)
 {
-	const PCVEC3 p[] = { PCBOX3CORNERS(b) };
-	return pc_frustum_corners_to_geometry_wkb(p,srid,wkbsize);
+	const LIVEC3 p[] = { LIBOX3CORNERS(b) };
+	return li_frustum_corners_to_geometry_wkb(p,srid,wkbsize);
 }
 
-//should we add a srid to PCFRUSTUM ?
+//should we add a srid to LIFRUSTUM ?
 uint8_t *
-pc_frustum_to_geometry_wkb(const PCFRUSTUM *f, uint32_t srid, size_t *wkbsize)
+li_frustum_to_geometry_wkb(const LIFRUSTUM *f, uint32_t srid, size_t *wkbsize)
 {
-	const PCVEC3 p[8];
-	if( ! pc_frustum_get_points((PCVEC3 *)p,f->fwd) )
+	const LIVEC3 p[8];
+	if( ! li_frustum_get_points((LIVEC3 *)p,f->fwd) )
 		return NULL;
-	return pc_frustum_corners_to_geometry_wkb(p,srid,wkbsize);
+	return li_frustum_corners_to_geometry_wkb(p,srid,wkbsize);
 }
 
 /*
@@ -899,14 +901,14 @@ pc_frustum_to_geometry_wkb(const PCFRUSTUM *f, uint32_t srid, size_t *wkbsize)
 * in practice mode=3 is a good trade off between efficiency and false positives
 */
 int
-pc_frustum_intersects(const PCFRUSTUM *f1, const PCFRUSTUM *f2, uint8_t mode)
+li_frustum_intersects(const LIFRUSTUM *f1, const LIFRUSTUM *f2, uint8_t mode)
 {
-	PCMAT44 m12, m21;
-	PCVEC4 plane[6];
-	PCVEC4 *p;
+	LIMAT44 m12, m21;
+	LIVEC4 plane[6];
+	LIVEC4 *p;
 	double *m, *mw;
 
-	assert(pc_frustum_is_valid(f1) && pc_frustum_is_valid(f2));
+	assert(li_frustum_is_valid(f1) && li_frustum_is_valid(f2));
 
 	if( mode<1 || mode>4 )
 	{
@@ -917,17 +919,17 @@ pc_frustum_intersects(const PCFRUSTUM *f1, const PCFRUSTUM *f2, uint8_t mode)
 	if(mode & 5) // mode is 1, 3 or 4
 	{
 		// checking the transformed frustum planes against the +-1 vertices
-		pc_matrix_44_multiply_matrix_44(m12,f2->bwd,f1->fwd);
+		li_matrix_44_multiply_matrix_44(m12,f2->bwd,f1->fwd);
 
 		p = plane;
 		mw = m12 + 12;
 		for( m = m12; m != mw; m+=4 )
 		{
-			pc_vector_4_add(*p, mw, m);
+			li_vector_4_add(*p, mw, m);
 			if ( fabs((*p)[0]) + fabs((*p)[1]) + fabs((*p)[2]) + (*p)[3] < 0 )
 				return PC_FALSE;
 			++p;
-			pc_vector_4_sub(*p, mw, m);
+			li_vector_4_sub(*p, mw, m);
 			if ( fabs((*p)[0]) + fabs((*p)[1]) + fabs((*p)[2]) + (*p)[3] < 0 )
 				return PC_FALSE;
 			++p;
@@ -937,17 +939,17 @@ pc_frustum_intersects(const PCFRUSTUM *f1, const PCFRUSTUM *f2, uint8_t mode)
 	if(mode & 6) // mode is 2, 3 or 4
 	{
 		// checking the transformed frustum planes against the +-1 vertices
-		pc_matrix_44_multiply_matrix_44(m21,f1->bwd,f2->fwd);
+		li_matrix_44_multiply_matrix_44(m21,f1->bwd,f2->fwd);
 
 		p = plane;
 		mw = m21 + 12;
 		for( m = m21; m != mw; m += 4 )
 		{
-			pc_vector_4_add(*p, mw, m);
+			li_vector_4_add(*p, mw, m);
 			if ( fabs((*p)[0]) + fabs((*p)[1]) + fabs((*p)[2]) + (*p)[3] < 0 )
 				return PC_FALSE;
 			++p;
-			pc_vector_4_sub(*p, mw, m);
+			li_vector_4_sub(*p, mw, m);
 			if ( fabs((*p)[0]) + fabs((*p)[1]) + fabs((*p)[2]) + (*p)[3] < 0 )
 				return PC_FALSE;
 			++p;
@@ -972,8 +974,8 @@ pc_frustum_intersects(const PCFRUSTUM *f1, const PCFRUSTUM *f2, uint8_t mode)
 		int paway1[] = { 5,0, 0,5, 3,0, 0,3, 3,0, 0,3 };
 		int paway2[] = { 6,3, 3,6, 5,6, 6,5, 6,5, 5,6 };
 
-		PCVEC3 corner[8];
-		if( ! pc_frustum_get_points(corner,m12) )
+		LIVEC3 corner[8];
+		if( ! li_frustum_get_points(corner,m12) )
 		{
 			pcerror("%s : failed to get finite frustum corners", __func__);
 			return PC_TRUE;
@@ -988,9 +990,9 @@ pc_frustum_intersects(const PCFRUSTUM *f1, const PCFRUSTUM *f2, uint8_t mode)
 			double *cedge = corner[pedge[i]];
 			double *caway1 = corner[paway1[i]];
 			double *caway2 = corner[paway2[i]];
-			PCVEC3 edge, absedge;
-			pc_vector_3_cross(edge,n0,n1); // 3 : last coordinate is not considered here
-			pc_vector_3_abs(absedge,edge);
+			LIVEC3 edge, absedge;
+			li_vector_3_cross(edge,n0,n1); // 3 : last coordinate is not considered here
+			li_vector_3_abs(absedge,edge);
 
 			// 3 canonical directions (0,0,1), (1,0,0) and (0,1,0) for the unit cube
 			// axis[j]=axis[j+1]=0, axis[j+2]=1
@@ -1000,14 +1002,14 @@ pc_frustum_intersects(const PCFRUSTUM *f1, const PCFRUSTUM *f2, uint8_t mode)
 			{
 				int k;
 				double tabs = absedge[j0] + absedge[j1];
-				PCVEC3 axis;
+				LIVEC3 axis;
 				axis[j0] = -edge[j1];
 				axis[j1] =  edge[j0];
 				axis[j2] =  0;
 
 				for( k = 0 ; k < 8 ; ++k )
 				{
-					double t = pc_vector_3_dot(corner[k],axis);
+					double t = li_vector_3_dot(corner[k],axis);
 					if( fabs(t) <= tabs )
 						break;
 				}
@@ -1015,7 +1017,7 @@ pc_frustum_intersects(const PCFRUSTUM *f1, const PCFRUSTUM *f2, uint8_t mode)
 				if( k==8 ) return PC_FALSE;
 			}
 #elif 0
-			// optimization1: no use to construct the axis PCVEC3, inlining the dot product
+			// optimization1: no use to construct the axis LIVEC3, inlining the dot product
 			for( j0 = 2, j1 = 0 ; j1 < 3 ; j0 = j1, ++j1 )
 			{
 				int k;
@@ -1065,23 +1067,23 @@ pc_frustum_intersects(const PCFRUSTUM *f1, const PCFRUSTUM *f2, uint8_t mode)
 }
 
 int
-pc_frustum_contains(const PCFRUSTUM *f1, const PCFRUSTUM *f2)
+li_frustum_contains(const LIFRUSTUM *f1, const LIFRUSTUM *f2)
 {
-	PCMAT44 mat;
-	PCVEC4 p;
+	LIMAT44 mat;
+	LIVEC4 p;
 	double *m, *mw;
 
-	assert(pc_frustum_is_valid(f1) && pc_frustum_is_valid(f2));
+	assert(li_frustum_is_valid(f1) && li_frustum_is_valid(f2));
 
-	pc_matrix_44_multiply_matrix_44(mat,f2->bwd,f1->fwd);
+	li_matrix_44_multiply_matrix_44(mat,f2->bwd,f1->fwd);
 
 	mw = mat + 12;
 	for( m = mat; m != mw; m += 4 )
 	{
-		pc_vector_4_add(p, mw, m);
+		li_vector_4_add(p, mw, m);
 		if ( fabs(p[0]) + fabs(p[1]) + fabs(p[2]) < p[3] )
 			return PC_FALSE;
-		pc_vector_4_sub(p, mw, m);
+		li_vector_4_sub(p, mw, m);
 		if ( fabs(p[0]) + fabs(p[1]) + fabs(p[2]) < p[3] )
 			return PC_FALSE;
 	}
@@ -1094,7 +1096,7 @@ pc_frustum_contains(const PCFRUSTUM *f1, const PCFRUSTUM *f2)
 * positive homogeneous coordinates
 */
 int
-pc_frustum_is_valid(const PCFRUSTUM *f)
+li_frustum_is_valid(const LIFRUSTUM *f)
 {
 	const double *m = f->fwd;
 	if ( m && f->bwd && ( fabs(m[12]) + fabs(m[13]) + fabs(m[14]) < m[15] ) )
@@ -1102,9 +1104,9 @@ pc_frustum_is_valid(const PCFRUSTUM *f)
 	return PC_FALSE;
 }
 
-int pc_frustum_copy(PCFRUSTUM *res, const PCFRUSTUM *f)
+int li_frustum_copy(LIFRUSTUM *res, const LIFRUSTUM *f)
 {
-	pc_matrix_44_copy(res->fwd, f->fwd);
+	li_matrix_44_copy(res->fwd, f->fwd);
 	if(!f->bwd)
 	{
 		if(res->bwd)
@@ -1121,20 +1123,20 @@ int pc_frustum_copy(PCFRUSTUM *res, const PCFRUSTUM *f)
 		if(!res->bwd)
 			return PC_FAILURE;
 	}
-	pc_matrix_44_copy(res->bwd, f->bwd);
+	li_matrix_44_copy(res->bwd, f->bwd);
 	res->det = f->det;
 	return PC_SUCCESS;
 }
 
-PCFRUSTUM *pc_frustum_make(PCMAT44 mat)
+LIFRUSTUM *li_frustum_make(LIMAT44 mat)
 {
-	PCFRUSTUM *f = pcalloc(sizeof(PCFRUSTUM));
-	pc_matrix_44_copy(f->fwd, mat);
+	LIFRUSTUM *f = pcalloc(sizeof(LIFRUSTUM));
+	li_matrix_44_copy(f->fwd, mat);
 	/* f->bwd = NULL; */
 	return f;
 }
 
-void pc_frustum_free(PCFRUSTUM *f)
+void li_frustum_free(LIFRUSTUM *f)
 {
 	if(f->bwd)
 		pcfree(f->bwd);
@@ -1147,7 +1149,7 @@ void pc_frustum_free(PCFRUSTUM *f)
 * Only try to make the frustum valid by negating its matrices
 */
 int
-pc_frustum_make_valid(PCFRUSTUM *res, const PCFRUSTUM *f)
+li_frustum_make_valid(LIFRUSTUM *res, const LIFRUSTUM *f)
 {
 	const double *m = f->fwd;
 	if ( !m || ( fabs(m[12]) + fabs(m[13]) + fabs(m[14]) >= fabs(m[15]) ) )
@@ -1162,26 +1164,26 @@ pc_frustum_make_valid(PCFRUSTUM *res, const PCFRUSTUM *f)
 
 	if( m[15] > 0 )
 	{
-		pc_matrix_44_copy(res->fwd, m);
+		li_matrix_44_copy(res->fwd, m);
 		if(f->bwd)
 		{
-			pc_matrix_44_copy(res->bwd, f->bwd);
+			li_matrix_44_copy(res->bwd, f->bwd);
 			res->det = f->det;
 			return PC_SUCCESS;
 		}
 	}
 	else
 	{
-		pc_matrix_44_multiply(res->fwd, m, -1);
+		li_matrix_44_multiply(res->fwd, m, -1);
 		if(f->bwd)
 		{
-			pc_matrix_44_copy(res->bwd, f->bwd);
+			li_matrix_44_copy(res->bwd, f->bwd);
 			res->det = f->det;
 			return PC_SUCCESS;
 		}
 	}
 
-	pc_matrix_44_adjugate(res->bwd,res->fwd,&res->det);
+	li_matrix_44_adjugate(res->bwd,res->fwd,&res->det);
 	return PC_SUCCESS;
 }
 
@@ -1190,15 +1192,15 @@ pc_frustum_make_valid(PCFRUSTUM *res, const PCFRUSTUM *f)
 * Volume
 */
 
-double pc_box_volume(const PCBOX3 b)
+double li_box_volume(const LIBOX3 b)
 {
-	PCVEC3 s = { PCVEC3SUB(b[1],b[0]) };
+	LIVEC3 s = { LIVEC3SUB(b[1],b[0]) };
 	return s[0]*s[1]*s[2];
 }
 
-double pc_frustum_volume(const PCFRUSTUM *f)
+double li_frustum_volume(const LIFRUSTUM *f)
 {
-	assert(pc_frustum_is_valid(f));
+	assert(li_frustum_is_valid(f));
 	const double *m = f->fwd;
 	double a = m[12], b = m[13], c = m[14], d = m[15];
 	double a2 = a*a;

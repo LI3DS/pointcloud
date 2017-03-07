@@ -6,7 +6,6 @@ LDFLAGS = $(XML2_LDFLAGS) $(ZLIB_LDFLAGS) $(GHT_LDFLASGS)
 CFLAGS += -fPIC
 
 OBJS = \
-	pc_matrix.o \
 	pc_bytes.o \
 	pc_dimstats.o \
 	pc_filter.o \
@@ -26,6 +25,12 @@ OBJS = \
 	stringbuffer.o \
 	hashtable.o \
 	pc_patch_lazperf.o
+
+OBJS += \
+	li_matrix.o \
+	li_patch.o \
+	li_point.o
+
 
 OBJS_LAZPERF = \
 	lazperf_adapter.o

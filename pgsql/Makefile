@@ -5,8 +5,11 @@ include ../config.mk
 OBJS = \
 	pc_inout.o \
 	pc_access.o \
-	pc_editor.o \
 	pc_pgsql.o
+
+OBJS += \
+	li_editor.o \
+	li_inout.o
 
 SED = sed
 EXTENSION = pointcloud
@@ -28,7 +31,7 @@ DATA_built = \
   $(EXTENSION)--$(EXTVERSION).sql \
   $(UPGRADES)
 
-REGRESS = pointcloud pointcloud_columns schema
+REGRESS = pointcloud pointcloud_columns schema li3ds
 
 ifneq ($(GHT_LDFLAGS),)
 REGRESS += pointcloud-ght

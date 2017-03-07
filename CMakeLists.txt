@@ -129,7 +129,7 @@ if (WITH_TESTS)
     add_custom_target(check COMMAND ${PROJECT_BINARY_DIR}/lib/cunit/cu_tester)
 
     find_program(PG_REGRESS pg_regress ${PGSQL_PKGLIBDIR}/pgxs/src/test/regress/ REQUIRED)
-    add_custom_target(installcheck COMMAND ${PG_REGRESS} --inputdir=${PROJECT_SOURCE_DIR}/pgsql --outputdir=${PROJECT_SOURCE_DIR}/pgsql pointcloud pointcloud_columns schema)
+    add_custom_target(installcheck COMMAND ${PG_REGRESS} --inputdir=${PROJECT_SOURCE_DIR}/pgsql --outputdir=${PROJECT_SOURCE_DIR}/pgsql pointcloud pointcloud_columns schema li3ds)
 endif()
 
 #------------------------------------------------------------------------------

@@ -1,10 +1,11 @@
 /***********************************************************************
-* pc_editor.c
+* li_editor.c
 *
 *  Editor functions for points and patches in PgSQL.
 *
 *  PgSQL Pointcloud is free and open source software provided
 *  by the Government of Canada
+*
 *  Copyright (c) 2013 Natural Resources Canada
 *  Copyright (c) 2017 Oslandia
 *
@@ -12,22 +13,22 @@
 
 #include "pc_pgsql.h"	   /* Common PgSQL support for our type */
 
-Datum pcpatch_rotate_quaternion(PG_FUNCTION_ARGS);
-Datum pcpatch_translate(PG_FUNCTION_ARGS);
-Datum pcpatch_affine(PG_FUNCTION_ARGS);
-Datum pcpatch_projective(PG_FUNCTION_ARGS);
-Datum pcpoint_rotate_quaternion(PG_FUNCTION_ARGS);
-Datum pcpoint_translate(PG_FUNCTION_ARGS);
-Datum pcpoint_affine(PG_FUNCTION_ARGS);
-Datum pcpoint_projective(PG_FUNCTION_ARGS);
+Datum lipatch_rotate_quaternion(PG_FUNCTION_ARGS);
+Datum lipatch_translate(PG_FUNCTION_ARGS);
+Datum lipatch_affine(PG_FUNCTION_ARGS);
+Datum lipatch_projective(PG_FUNCTION_ARGS);
+Datum lipoint_rotate_quaternion(PG_FUNCTION_ARGS);
+Datum lipoint_translate(PG_FUNCTION_ARGS);
+Datum lipoint_affine(PG_FUNCTION_ARGS);
+Datum lipoint_projective(PG_FUNCTION_ARGS);
 
 /**
 * Rotate a patch based on a rotation quaternion
 * PC_RotateQuaternion(patch pcpatch, qw float8, qx float8, qy float8, qz float8,
 *					  xdimname text, ydimname text, zdimname text) returns pcpatch
 */
-PG_FUNCTION_INFO_V1(pcpatch_rotate_quaternion);
-Datum pcpatch_rotate_quaternion(PG_FUNCTION_ARGS)
+PG_FUNCTION_INFO_V1(lipatch_rotate_quaternion);
+Datum lipatch_rotate_quaternion(PG_FUNCTION_ARGS)
 {
 	SERIALIZED_PATCH *serpatch;
 	PCPATCH *patch_in, *patch_out;
@@ -56,7 +57,7 @@ Datum pcpatch_rotate_quaternion(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	patch_out = pc_patch_rotate_quaternion(
+	patch_out = li_patch_rotate_quaternion(
 		patch_in, qw, qx, qy, qz, xdimname, ydimname, zdimname);
 	if ( ! patch_out )
 	{
@@ -77,8 +78,8 @@ Datum pcpatch_rotate_quaternion(PG_FUNCTION_ARGS)
 * PC_Translate(patch pcpatch, tx float8, ty float8, tz float8,
 *			   xdimname text, ydimname text, zdimname text) returns pcpatch
 */
-PG_FUNCTION_INFO_V1(pcpatch_translate);
-Datum pcpatch_translate(PG_FUNCTION_ARGS)
+PG_FUNCTION_INFO_V1(lipatch_translate);
+Datum lipatch_translate(PG_FUNCTION_ARGS)
 {
 	SERIALIZED_PATCH *serpatch;
 	PCPATCH *patch_in, *patch_out;
@@ -106,7 +107,7 @@ Datum pcpatch_translate(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	patch_out = pc_patch_translate(
+	patch_out = li_patch_translate(
 		patch_in, tx, ty, tz, xdimname, ydimname, zdimname);
 	if ( ! patch_out )
 	{
@@ -131,8 +132,8 @@ Datum pcpatch_translate(PG_FUNCTION_ARGS)
 *			xoff float8, yoff float8, zoff float8,
 *			xdimname text, ydimname text, zdimname text) returns pcpatch
 */
-PG_FUNCTION_INFO_V1(pcpatch_affine);
-Datum pcpatch_affine(PG_FUNCTION_ARGS)
+PG_FUNCTION_INFO_V1(lipatch_affine);
+Datum lipatch_affine(PG_FUNCTION_ARGS)
 {
 	SERIALIZED_PATCH *serpatch;
 	PCPATCH *patch_in, *patch_out;
@@ -170,7 +171,7 @@ Datum pcpatch_affine(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	patch_out = pc_patch_affine(patch_in,
+	patch_out = li_patch_affine(patch_in,
 		a, b, c, d, e, f, g, h, i, xoff, yoff, zoff,
 		xdimname, ydimname, zdimname);
 	if ( ! patch_out )
@@ -196,8 +197,8 @@ Datum pcpatch_affine(PG_FUNCTION_ARGS)
 *			m float8, n float8, o float8, p float8,
 *			xdimname text, ydimname text, zdimname text) returns pcpatch
 */
-PG_FUNCTION_INFO_V1(pcpatch_projective);
-Datum pcpatch_projective(PG_FUNCTION_ARGS)
+PG_FUNCTION_INFO_V1(lipatch_projective);
+Datum lipatch_projective(PG_FUNCTION_ARGS)
 {
 	SERIALIZED_PATCH *serpatch;
 	PCPATCH *patch_in, *patch_out;
@@ -238,7 +239,7 @@ Datum pcpatch_projective(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	patch_out = pc_patch_projective(patch_in,
+	patch_out = li_patch_projective(patch_in,
 		a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p,
 		xdimname, ydimname, zdimname);
 	if ( ! patch_out )
@@ -260,8 +261,8 @@ Datum pcpatch_projective(PG_FUNCTION_ARGS)
 * PC_RotateQuaternion(point pcpoint, qw float8, qx float8, qy float8, qz float8,
 *					  xdimname text, ydimname text, zdimname text) returns pcpoint
 */
-PG_FUNCTION_INFO_V1(pcpoint_rotate_quaternion);
-Datum pcpoint_rotate_quaternion(PG_FUNCTION_ARGS)
+PG_FUNCTION_INFO_V1(lipoint_rotate_quaternion);
+Datum lipoint_rotate_quaternion(PG_FUNCTION_ARGS)
 {
 	SERIALIZED_POINT *serpoint;
 	PCPOINT *point;
@@ -290,7 +291,7 @@ Datum pcpoint_rotate_quaternion(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	pc_point_rotate_quaternion(
+	li_point_rotate_quaternion(
 		point, qw, qx, qy, qz, xdimname, ydimname, zdimname);
 
 	serpoint = pc_point_serialize(point);
@@ -305,8 +306,8 @@ Datum pcpoint_rotate_quaternion(PG_FUNCTION_ARGS)
 * PC_Translate(point pcpoint, tx float8, ty float8, tz float8,
 *			   xdimname text, ydimname text, zdimname text) returns pcpoint
 */
-PG_FUNCTION_INFO_V1(pcpoint_translate);
-Datum pcpoint_translate(PG_FUNCTION_ARGS)
+PG_FUNCTION_INFO_V1(lipoint_translate);
+Datum lipoint_translate(PG_FUNCTION_ARGS)
 {
 	SERIALIZED_POINT *serpoint;
 	PCPOINT *point;
@@ -334,7 +335,7 @@ Datum pcpoint_translate(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	pc_point_translate(
+	li_point_translate(
 		point, tx, ty, tz, xdimname, ydimname, zdimname);
 
 	serpoint = pc_point_serialize(point);
@@ -353,8 +354,8 @@ Datum pcpoint_translate(PG_FUNCTION_ARGS)
 *			xoff float8, yoff float8, zoff float8,
 *			xdimname text, ydimname text, zdimname text) returns pcpoint
 */
-PG_FUNCTION_INFO_V1(pcpoint_affine);
-Datum pcpoint_affine(PG_FUNCTION_ARGS)
+PG_FUNCTION_INFO_V1(lipoint_affine);
+Datum lipoint_affine(PG_FUNCTION_ARGS)
 {
 	SERIALIZED_POINT *serpoint;
 	PCPOINT *point;
@@ -392,7 +393,7 @@ Datum pcpoint_affine(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	pc_point_affine(point,
+	li_point_affine(point,
 		a, b, c, d, e, f, g, h, i, xoff, yoff, zoff,
 		xdimname, ydimname, zdimname);
 
@@ -412,8 +413,8 @@ Datum pcpoint_affine(PG_FUNCTION_ARGS)
 *			m float8, n float8, o float8, p float8,
 *			xdimname text, ydimname text, zdimname text) returns pcpoint
 */
-PG_FUNCTION_INFO_V1(pcpoint_projective);
-Datum pcpoint_projective(PG_FUNCTION_ARGS)
+PG_FUNCTION_INFO_V1(lipoint_projective);
+Datum lipoint_projective(PG_FUNCTION_ARGS)
 {
 	SERIALIZED_POINT *serpoint;
 	PCPOINT *point;
@@ -454,7 +455,7 @@ Datum pcpoint_projective(PG_FUNCTION_ARGS)
 		PG_RETURN_NULL();
 	}
 
-	pc_point_projective(point,
+	li_point_projective(point,
 		a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p,
 		xdimname, ydimname, zdimname);
 

@@ -8,6 +8,7 @@
 ***********************************************************************/
 
 #include "pc_api_internal.h"
+#include "li_api_internal.h"
 
 #define PC_TEST(test_func) { #test_func, test_func }
 #define MAX_CUNIT_MSG_LENGTH 512
