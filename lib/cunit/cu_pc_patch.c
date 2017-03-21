@@ -39,9 +39,9 @@ init_suite(void)
 	if ( !simpleschema ) return 1;
 
 	xmlstr = file_to_str(simplexyzxmlfile);
-	rv = pc_schema_from_xml(xmlstr, &simplexyzschema);
+	simplexyzschema = pc_schema_from_xml(xmlstr);
 	pcfree(xmlstr);
-	if ( rv == PC_FAILURE ) return 1;
+	if ( !simplexyzschema ) return 1;
 
 	xmlstr = file_to_str(lasxmlfile);
 	lasschema = pc_schema_from_xml(xmlstr);
