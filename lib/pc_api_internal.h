@@ -291,32 +291,4 @@ void pc_bitmap_filter(PCBITMAP *map, PC_FILTERTYPE filter, int i, double d, doub
 /** Read indicated bit of bitmap */
 #define pc_bitmap_get(map, i) ((map)->map[(i)])
 
-/****************************************************************************
-* MATRIX
-*/
-
-void pc_matrix_43_set(PCMAT43 mat, double a, double b, double c, double d, double e, double f, double g, double h, double i, double xoff, double yoff, double zoff);
-void pc_matrix_44_set(PCMAT44 mat, double a,  double b, double c, double d, double e, double f, double g, double h, double i, double j, double k, double l, double m, double n, double o, double p);
-void pc_matrix_33_set_from_quaternion(PCMAT33 mat, double qw, double qx, double qy, double qz);
-void pc_matrix_33_multiply_vector_3(PCVEC3 rotatedvec, const PCMAT33 mat, const PCVEC3 vec);
-void pc_matrix_43_transform_affine(PCVEC3 res, const PCMAT43 mat, const PCVEC3 vec);
-int pc_matrix_44_transform_projective_vector_3(PCVEC3 res, const PCMAT44 mat, const PCVEC3 vec);
-void pc_matrix_44_transpose(PCMAT44 res, const PCMAT44 mat);
-void pc_matrix_44_multiply_matrix_44(PCMAT44 res, const PCMAT44 mat1, const PCMAT44 mat2);
-void pc_matrix_44_multiply_vector_3(PCVEC4 res, const PCMAT44 mat, const PCVEC3 vec);
-void pc_matrix_44_multiply_vector_4(PCVEC4 res, const PCMAT44 mat, const PCVEC4 vec);
-double pc_matrix_44_determinant(const PCMAT44 m);
-void pc_matrix_44_adjugate(PCMAT44 res, const PCMAT44 m, double *determinant);
-int pc_matrix_44_inverse(PCMAT44 res, const PCMAT44 m);
-
-void pc_matrix_44_warn(const char *func, int line, const char *name, const PCMAT44 m);
-void pc_vector_3_warn(const char *func, int line, const char *name, const PCVEC4 v);
-void pc_vector_4_warn(const char *func, int line, const char *name, const PCVEC4 v);
-
-#define PCWARND(x) pcwarn("%s:%d %s=%d",__func__,__LINE__,#x,x);
-#define PCWARNLF(x) pcwarn("%s:%d %s=%lf",__func__,__LINE__,#x,x);
-#define PCWARNVEC3(x) pc_vector_3_warn(__func__,__LINE__,#x,x);
-#define PCWARNVEC4(x) pc_vector_4_warn(__func__,__LINE__,#x,x);
-#define PCWARNMAT44(x) pc_matrix_44_warn(__func__,__LINE__,#x,x);
-
 #endif /* _PC_API_INTERNAL_H */

@@ -10,6 +10,7 @@
 ***********************************************************************/
 
 #include "pc_api.h"
+#include "li_api.h"
 
 #include "postgres.h"
 #include "utils/elog.h"

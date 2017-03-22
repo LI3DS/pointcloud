@@ -11,9 +11,14 @@ set (PC_TEST_SOURCES
   cu_pc_patch.c
   cu_pc_patch_lazperf.c
   cu_pc_sort.c
-  cu_pc_frustum.c
-  cu_pc_matrix.c
   cu_tester.c
+  )
+
+set (LI_TEST_SOURCES
+  cu_li_frustum.c
+  cu_li_matrix.c
+  cu_li_patch.c
+  cu_li_point.c
   )
 
 set (PC_TEST_HEADERS
@@ -30,7 +35,7 @@ set (GHT_TEST_DATA
 include_directories ("${PROJECT_SOURCE_DIR}/lib")
 include_directories ("${CUNIT_INCLUDE_DIR}")
 
-add_executable(cu_tester ${PC_TEST_SOURCES} ${PC_TEST_HEADERS})
+add_executable(cu_tester ${PC_TEST_SOURCES} ${LI_TEST_SOURCES} ${PC_TEST_HEADERS})
 target_link_libraries (cu_tester libpc-static ${CUNIT_LIBRARIES})
 
 add_test(cu_tester cu_tester)

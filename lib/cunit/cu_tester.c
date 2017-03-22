@@ -21,8 +21,10 @@ extern CU_SuiteInfo bytes_suite;
 extern CU_SuiteInfo lazperf_suite;
 extern CU_SuiteInfo sort_suite;
 extern CU_SuiteInfo interp_suite;
-extern CU_SuiteInfo frustum_suite;
-extern CU_SuiteInfo matrix_suite;
+extern CU_SuiteInfo li_frustum_suite;
+extern CU_SuiteInfo li_matrix_suite;
+extern CU_SuiteInfo li_patch_suite;
+extern CU_SuiteInfo li_point_suite;
 
 /**
 * CUnit error handler
@@ -60,8 +62,10 @@ int main(int argc, char *argv[])
 		lazperf_suite,
 		sort_suite,
 		interp_suite,
-		frustum_suite,
-		matrix_suite,
+		li_frustum_suite,
+		li_matrix_suite,
+		li_patch_suite,
+		li_point_suite,
 		CU_SUITE_INFO_NULL
 	};
 

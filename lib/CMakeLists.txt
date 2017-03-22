@@ -6,7 +6,6 @@ set ( PC_SOURCES
         pc_dimstats.c      
         pc_filter.c    
         pc_interp.c
-        pc_matrix.c
         pc_mem.c 
         pc_patch.c
         pc_patch_dimensional.c
@@ -22,6 +21,12 @@ set ( PC_SOURCES
         pc_val.c
         )
 
+set ( LI_SOURCES
+        li_matrix.c
+        li_patch.c
+        li_point.c
+        )
+
 set ( LAZPERF_SOURCES
         lazperf_adapter.cpp
         )
@@ -34,7 +39,12 @@ set ( PC_HEADERS
         pc_config.h
         )
 
-add_library (libpc-static STATIC ${PC_SOURCES} ${PC_HEADERS})
+set ( LI_HEADERS
+        li_api.h
+        li_api_internal.h
+        )
+
+add_library (libpc-static STATIC ${PC_SOURCES} ${PC_HEADERS} ${LI_SOURCES} ${LI_HEADERS})
 add_library (liblazperf-static STATIC ${LAZPERF_SOURCES})
 
 set_target_properties (libpc-static 

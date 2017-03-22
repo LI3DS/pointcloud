@@ -1,6 +1,6 @@
 
 /***********************************************************************
-* cu_pc_frustum.c
+* cu_li_frustum.c
 *
 *        Testing for the frustum API functions
 *
@@ -14,7 +14,7 @@
 /* GLOBALS ************************************************************/
 
 #define N (5)
-const PCBOX3 b[N] = {
+const LIBOX3 b[N] = {
 	{ {  0, 0, 0 }, {  3, 4, 5 } },
 	{ {  9,10,11 }, { 12,13,14 } },
 	{ { -1,-1,-1 }, {  1, 1, 1 } },
@@ -22,7 +22,7 @@ const PCBOX3 b[N] = {
 	{ { 1,1,1 }, {  2, 3, 3 } }
 };
 
-PCFRUSTUM f[N];
+LIFRUSTUM f[N];
 
 /* Setup/teardown for this suite */
 static int
@@ -30,7 +30,7 @@ init_suite(void)
 {
 	int i = 0;
 	for( i = 0; i < N; ++i )
-		pc_frustum_from_box(f+i,b[i]);
+		li_frustum_from_box(f+i,b[i]);
 
 	// TODO: non axis aligned frustums
 
@@ -47,13 +47,13 @@ clean_suite(void)
 /* TESTS **************************************************************/
 
 static void
-test_frustum_wkb_expected(PCFRUSTUM *frustum, const char *expected)
+test_frustum_wkb_expected(LIFRUSTUM *frustum, const char *expected)
 {
 	size_t wkbsize;
 	uint8_t *wkb;
 	char *hexbytes;
 	uint32_t srid = 0;
-	wkb = pc_frustum_to_geometry_wkb(frustum,srid,&wkbsize);
+	wkb = li_frustum_to_geometry_wkb(frustum,srid,&wkbsize);
 	hexbytes = hexbytes_from_bytes(wkb,wkbsize);
 
 	if(expected)
@@ -83,7 +83,7 @@ test_frustum_is_valid()
 {
 	int i;
 	for( i = 0; i < N; ++i )
-		pc_frustum_is_valid(f+i);
+		li_frustum_is_valid(f+i);
 }
 
 static void
@@ -118,7 +118,7 @@ test_frustum_intersects()
 	for( mode = 1; mode < 5; ++mode )
 		for( i = 0; i < N; ++i )
 			for( j = 0; j < N; ++j )
-				CU_ASSERT( pc_frustum_intersects(f+i,f+j,mode) == expected[i+N*(j+N*(mode-1))] );
+				CU_ASSERT( li_frustum_intersects(f+i,f+j,mode) == expected[i+N*(j+N*(mode-1))] );
 }
 
 static void
@@ -134,7 +134,7 @@ test_frustum_contains()
 	};
 	for( i = 0; i < N; ++i )
 		for( j = 0; j < N; ++j )
-			CU_ASSERT( pc_frustum_contains(f+i,f+j) == expected[N*j+i] );
+			CU_ASSERT( li_frustum_contains(f+i,f+j) == expected[N*j+i] );
 }
 
 static void
@@ -143,15 +143,15 @@ test_frustum_volume()
 	int i;
 	for( i = 0; i < N; ++i )
 	{
-		double bv = pc_box_volume(b[i]);
-		double fv = pc_frustum_volume(f+i);
+		double bv = li_box_volume(b[i]);
+		double fv = li_frustum_volume(f+i);
 		CU_ASSERT_DOUBLE_EQUAL( bv, fv, 0.0000001 );
 	}
 }
 
 /* REGISTER ***********************************************************/
 
-CU_TestInfo frustum_tests[] = {
+CU_TestInfo li_frustum_tests[] = {
 	PC_TEST(test_frustum_wkb),
 	PC_TEST(test_frustum_is_valid),
 	PC_TEST(test_frustum_intersects),
@@ -160,9 +160,9 @@ CU_TestInfo frustum_tests[] = {
 	CU_TEST_INFO_NULL
 };
 
-CU_SuiteInfo frustum_suite = {
-	.pName = "frustum",
+CU_SuiteInfo li_frustum_suite = {
+	.pName = "li_frustum",
 	.pInitFunc = init_suite,
 	.pCleanupFunc = clean_suite,
-	.pTests = frustum_tests
+	.pTests = li_frustum_tests
 };
