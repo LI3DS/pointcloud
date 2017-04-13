@@ -19,8 +19,8 @@
   <pc:dimension>
     <pc:position>3</pc:position>
     <pc:size>4</pc:size>
-    <pc:description>Z coordinate as a long integer. You must use the scale and offset information of the header to determine the double value.</pc:description>
-    <pc:name>Z</pc:name>
+    <pc:description>M coordinate as a long integer. You must use the scale and offset information of the header to determine the double value.</pc:description>
+    <pc:name>M</pc:name>
     <pc:interpretation>int32_t</pc:interpretation>
     <pc:scale>4</pc:scale>
   </pc:dimension>

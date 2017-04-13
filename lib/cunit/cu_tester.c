@@ -20,6 +20,7 @@ extern CU_SuiteInfo ght_suite;
 extern CU_SuiteInfo bytes_suite;
 extern CU_SuiteInfo lazperf_suite;
 extern CU_SuiteInfo sort_suite;
+extern CU_SuiteInfo util_suite;
 extern CU_SuiteInfo interp_suite;
 extern CU_SuiteInfo li_frustum_suite;
 extern CU_SuiteInfo li_matrix_suite;
@@ -61,6 +62,7 @@ int main(int argc, char *argv[])
 		bytes_suite,
 		lazperf_suite,
 		sort_suite,
+		util_suite,
 		interp_suite,
 		li_frustum_suite,
 		li_matrix_suite,

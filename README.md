@@ -53,6 +53,17 @@ Note that if you configured PointCloud using a non-standard LibGHT location, you
 
 - ``LD_LIBRARY_PATH=$HOME/local/lib make check``
 
+### SQL Tests ###
+
+pointcloud includes SQL tests to run against an existing installation.
+
+Run the SQL tests:
+
+- `sudo make install`
+- `PGUSER=a_user PGPASSWORD=a_password PGHOST=localhost make installcheck`
+
+This command will create a database named `contrib_regression` and will execute the SQL scripts located in `pgsql/sql` in this database.
+
 ### Activate ###
 
 - Create a new database: ``CREATE DATABASE mynewdb``
@@ -190,6 +201,8 @@ Now that you have created two tables, you'll see entries for them in the `pointc
 
 ## Functions ##
 
+### PcPoint Functions
+
 **PC_MakePoint(pcid integer, vals float8[])** returns **pcpoint**
 
 > Given a valid `pcid` schema number and an array of doubles that matches the schema, construct a new `pcpoint`.
@@ -223,17 +236,9 @@ Now that you have created two tables, you'll see entries for them in the `pointc
 
 > Return the `pcid` schema number of this point.
 >
->     SELECT PC_PCId('010100000064CEFFFF94110000703000000400'::pcpoint));
+>     SELECT PC_PCId('010100000064CEFFFF94110000703000000400'::pcpoint);
 > 
 >     1     
-
-**PC_AsBinary(p pcpoint)** returns **bytea**
-
-> Return the OGC "well-known binary" format for the point.
->
->     SELECT PC_AsBinary('010100000064CEFFFF94110000703000000400'::pcpoint);
->
->     \x01010000800000000000c05fc000000000008046400000000000005f40
 
 **PC_Get(pt pcpoint, dimname text)** returns **numeric**
 
@@ -251,6 +256,8 @@ Now that you have created two tables, you'll see entries for them in the `pointc
 >     SELECT PC_Get('010100000064CEFFFF94110000703000000400'::pcpoint);
 >
 >     {-127,45,124,4}
+
+### PcPatch Functions
 
 **PC_Patch(pts pcpoint[])** returns **pcpatch**
 
@@ -274,19 +281,7 @@ Now that you have created two tables, you'll see entries for them in the `pointc
 >     SELECT PC_PCId(pa) FROM patches LIMIT 1;
 > 
 >     1     
- 
-**PC_Envelope(p pcpatch)** returns **bytea**
 
-> Return the OGC "well-known binary" format for *bounds* of the patch.
-> Useful for performing intersection tests with geometries.
-> 
->     SELECT PC_Envelope(pa) FROM patches LIMIT 1;
->
->     \x0103000000010000000500000090c2f5285cbf5fc0e17a
->     14ae4781464090c2f5285cbf5fc0ec51b81e858b46400ad7
->     a3703dba5fc0ec51b81e858b46400ad7a3703dba5fc0e17a
->     14ae4781464090c2f5285cbf5fc0e17a14ae47814640
- 
 **PC_AsText(p pcpatch)** returns **text**
 
 > Return a JSON version of the data in that patch.
@@ -391,7 +386,7 @@ Now that you have created two tables, you'll see entries for them in the `pointc
 >
 >     45.5
 
-**PC_PatchAvg(p pcpatch,)** returns **pcpoint** (from 1.1.0)
+**PC_PatchAvg(p pcpatch)** returns **pcpoint** (from 1.1.0)
 
 > Returns a PcPoint with the *average* values of each dimension in the patch.
 >
@@ -497,7 +492,7 @@ Now that you have created two tables, you'll see entries for them in the `pointc
 
 **PC_Range(p pcpatch, start int4, n int4)** returns **pcpatch**
 
-> Returns a patch containing *n* points. These points are selected from the *start*-th point of the patch in parameter.
+> Returns a patch containing *n* points. These points are selected from the *start*-th point with 1-based indexing.
 
 **PC_SetPCID(p pcpatch, pcid int4)** returns **pcpatch**
 
@@ -522,6 +517,41 @@ Now that you have created two tables, you'll see entries for them in the `pointc
 >     )
 >     SELECT PC_RotateQuaternion(pt, cos(angle.value / 2.0), sin(angle.value / 2.0), 0, 0, 'x', 'y', 'z')
 >     FROM points, angle;
+
+### OGC "well-known binary" Functions
+
+**PC_AsBinary(p pcpoint)** returns **bytea**
+
+> Return the OGC "well-known binary" format for the point.
+>
+>     SELECT PC_AsBinary('010100000064CEFFFF94110000703000000400'::pcpoint);
+>
+>     \x01010000800000000000c05fc000000000008046400000000000005f40
+
+**PC_EnvelopeAsBinary(p pcpatch)** returns **bytea**
+
+> Return the OGC "well-known binary" format for the 2D *bounds* of the patch.
+> Useful for performing 2D intersection tests with geometries.
+>
+>     SELECT PC_EnvelopeAsBinary(pa) FROM patches LIMIT 1;
+>
+>     \x0103000000010000000500000090c2f5285cbf5fc0e17a
+>     14ae4781464090c2f5285cbf5fc0ec51b81e858b46400ad7
+>     a3703dba5fc0ec51b81e858b46400ad7a3703dba5fc0e17a
+>     14ae4781464090c2f5285cbf5fc0e17a14ae47814640
+
+**PC_BoundingDiagonalAsBinary(p pcpatch)** returns **bytea**
+
+> Return the OGC "well-known binary" format for the bounding diagonal of the patch.
+>
+>    SELECT PC_BoundingDiagonalAsBinary(
+>        PC_Patch(ARRAY[
+>            PC_MakePoint(1, ARRAY[0.,0.,0.,10.]),
+>            PC_MakePoint(1, ARRAY[1.,1.,1.,10.]),
+>            PC_MakePoint(1, ARRAY[10.,10.,10.,10.])]));
+>
+>    \x01020000a0e610000002000000000000000000000000000000000000000000000000000000000000000000244000000000000024400000000000002440
+>>>>>>> upstream/master
 
 ## PostGIS Integration ##
 
@@ -562,12 +592,45 @@ The `pointcloud_postgis` extension adds functions that allow you to use PostgreS
 **Geometry(pcpoint)** returns **geometry**<br/>
 **pcpoint::geometry** returns **geometry**
 
-> Cast PcPoint to the PostGIS geometry equivalent, placing the x/y/z of the 
-> PcPoint into the x/y/z of the PostGIS point. 
+> Casts PcPoint to the PostGIS geometry equivalent, placing the x/y/z/m of the
+> PcPoint into the x/y/z/m of the PostGIS point.
 > 
 >     SELECT ST_AsText(PC_MakePoint(1, ARRAY[-127, 45, 124.0, 4.0])::geometry);
 > 
 >     POINT Z (-127 45 124)
+
+**PC_Envelope(pcpatch)** returns **geometry**
+
+> Returns the 2D *bounds* of the patch as a PostGIS Polygon 2D.
+> Useful for performing 2D intersection tests with PostGIS geometries.
+>
+>     SELECT ST_AsText(PC_Envelope(pa)) FROM patches LIMIT 1;
+>
+>     POLYGON((-126.99 45.01,-126.99 45.09,-126.91 45.09,-126.91 45.01,-126.99 45.01))
+
+**PC_BoundingDiagonal(pcpatch)** returns **geometry**
+
+> Returns the bounding diagonal of a patch. This is a LineString (2D), a LineString Z or a LineString M or a LineString ZM, based on the existence of the Z and M dimensions in the patch. This function is useful for creating an index on a patch column.
+>
+>     SELECT ST_AsText(PC_BoundingDiagonal(pa)) FROM patches;
+>                       st_astext
+>    ------------------------------------------------
+>     LINESTRING Z (-126.99 45.01 1,-126.91 45.09 9)
+>     LINESTRING Z (-126 46 100,-126 46 100)
+>     LINESTRING Z (-126.2 45.8 80,-126.11 45.89 89)
+>     LINESTRING Z (-126.4 45.6 60,-126.31 45.69 69)
+>     LINESTRING Z (-126.3 45.7 70,-126.21 45.79 79)
+>     LINESTRING Z (-126.8 45.2 20,-126.71 45.29 29)
+>     LINESTRING Z (-126.5 45.5 50,-126.41 45.59 59)
+>     LINESTRING Z (-126.6 45.4 40,-126.51 45.49 49)
+>     LINESTRING Z (-126.9 45.1 10,-126.81 45.19 19)
+>     LINESTRING Z (-126.7 45.3 30,-126.61 45.39 39)
+>     LINESTRING Z (-126.1 45.9 90,-126.01 45.99 99)
+>    (11 rows)gq
+>
+> For example, this is how one may want to create an index:
+>
+>     CREATE INDEX ON patches USING GIST(PC_BoundingDiagonal(patch) gist_geometry_ops_nd);
 
 ## Compressions ##
 
