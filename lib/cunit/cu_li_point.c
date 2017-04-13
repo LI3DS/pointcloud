@@ -58,11 +58,11 @@ test_point_rotate_quaternion()
 	qy = 0;
 	qz = 0;
 	li_point_rotate_quaternion(pt, qw, qx, qy, qz, NULL, NULL, NULL);
-	v = pc_point_get_x(pt);
+	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == 1);
-	v = pc_point_get_y(pt);
+	pc_point_get_y(pt, &v);
 	CU_ASSERT(v == -1);
-	v = pc_point_get_z(pt);
+	pc_point_get_z(pt, &v);
 	CU_ASSERT(v == 1);
 	pc_point_free(pt);
 
@@ -78,11 +78,11 @@ test_point_rotate_quaternion()
 	qy = sin(angle / 2.);
 	qz = 0;
 	li_point_rotate_quaternion(pt, qw, qx, qy, qz, NULL, NULL, NULL);
-	v = pc_point_get_x(pt);
+	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == 1);
-	v = pc_point_get_y(pt);
+	pc_point_get_y(pt, &v);
 	CU_ASSERT(v == 1);
-	v = pc_point_get_z(pt);
+	pc_point_get_z(pt, &v);
 	CU_ASSERT(v == -1);
 	pc_point_free(pt);
 
@@ -98,11 +98,11 @@ test_point_rotate_quaternion()
 	qy = 0;
 	qz = sin(angle / 2.);
 	li_point_rotate_quaternion(pt, qw, qx, qy, qz, NULL, NULL, NULL);
-	v = pc_point_get_x(pt);
+	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == -1);
-	v = pc_point_get_y(pt);
+	pc_point_get_y(pt, &v);
 	CU_ASSERT(v == 1);
-	v = pc_point_get_z(pt);
+	pc_point_get_z(pt, &v);
 	CU_ASSERT(v == 1);
 	pc_point_free(pt);
 }
@@ -156,11 +156,11 @@ test_point_translate()
 	ty = 1.0;
 	tz = 2.0;
 	li_point_translate(pt, tx, ty, tz, NULL, NULL, NULL);
-	v = pc_point_get_x(pt);
+	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == 0);
-	v = pc_point_get_y(pt);
+	pc_point_get_y(pt, &v);
 	CU_ASSERT(v == 2);
-	v = pc_point_get_z(pt);
+	pc_point_get_z(pt, &v);
 	CU_ASSERT(v == 3);
 	pc_point_free(pt);
 }
@@ -223,11 +223,11 @@ test_point_affine()
 			pt,
 			a, b, c, d, e, f, g, h, i, xoff, yoff, zoff,
 			NULL, NULL, NULL);
-	v = pc_point_get_x(pt);
+	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == 3);
-	v = pc_point_get_y(pt);
+	pc_point_get_y(pt, &v);
 	CU_ASSERT(v == 3);
-	v = pc_point_get_z(pt);
+	pc_point_get_z(pt, &v);
 	CU_ASSERT(v == 3);
 	pc_point_free(pt);
 }
@@ -291,11 +291,11 @@ test_point_projective()
 			0, 0, 1, 0,
 			0, 0, 1, 0,
 			NULL, NULL, NULL);
-	v = pc_point_get_x(pt);
+	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == -0.5);
-	v = pc_point_get_y(pt);
+	pc_point_get_y(pt, &v);
 	CU_ASSERT(v == -0.5);
-	v = pc_point_get_z(pt);
+	pc_point_get_z(pt, &v);
 	CU_ASSERT(v == 1);
 	pc_point_free(pt);
 }
