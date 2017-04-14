@@ -15,12 +15,12 @@
 
 static PCSCHEMA *schema = NULL;
 static PCSCHEMA *simpleschema = NULL;
-static PCSCHEMA *simplexyzschema = NULL;
+static PCSCHEMA *simpleschema_nointensity = NULL;
 static PCSCHEMA *lasschema = NULL;
 static PCSCHEMA *simplelazschema = NULL;
 static const char *xmlfile = "data/pdal-schema.xml";
 static const char *simplexmlfile = "data/simple-schema.xml";
-static const char *simplexyzxmlfile = "data/simple-schema-xyz.xml";
+static const char *simplexmlfile_nointensity = "data/simple-schema-no-intensity.xml";
 static const char *lasxmlfile = "data/las-schema.xml";
 static const char *simplelazxmlfile = "data/simple-schema-laz.xml";
 
@@ -38,10 +38,10 @@ init_suite(void)
 	pcfree(xmlstr);
 	if ( !simpleschema ) return 1;
 
-	xmlstr = file_to_str(simplexyzxmlfile);
-	simplexyzschema = pc_schema_from_xml(xmlstr);
+	xmlstr = file_to_str(simplexmlfile_nointensity);
+	simpleschema_nointensity = pc_schema_from_xml(xmlstr);
 	pcfree(xmlstr);
-	if ( !simplexyzschema ) return 1;
+	if ( !simpleschema_nointensity ) return 1;
 
 	xmlstr = file_to_str(lasxmlfile);
 	lasschema = pc_schema_from_xml(xmlstr);
@@ -61,7 +61,7 @@ clean_suite(void)
 {
 	pc_schema_free(schema);
 	pc_schema_free(simpleschema);
-	pc_schema_free(simplexyzschema);
+	pc_schema_free(simpleschema_nointensity);
 	pc_schema_free(lasschema);
 	pc_schema_free(simplelazschema);
 	return 0;
@@ -1063,7 +1063,7 @@ test_patch_set_schema_compression_none()
 	pau = pc_patch_uncompressed_from_pointlist(pl);
 
 	// assign a valid schema to the patch
-	pat = pc_patch_set_schema((PCPATCH*) pau, simplexyzschema);
+	pat = pc_patch_set_schema((PCPATCH*) pau, simpleschema_nointensity);
 	str = pc_patch_to_string(pat);
 
 	CU_ASSERT(pat != NULL);
@@ -1105,7 +1105,7 @@ test_patch_set_schema_compression_ght()
 	pag = pc_patch_ght_from_pointlist(pl);
 
 	// assign a valid schema to the patch
-	pat0 = pc_patch_set_schema((PCPATCH*) pag, simplexyzschema);
+	pat0 = pc_patch_set_schema((PCPATCH*) pag, simpleschema_nointensity);
 	str = pc_patch_to_string(pat0);
 
 	CU_ASSERT(pat0 != NULL);
@@ -1158,7 +1158,7 @@ test_patch_set_schema_compression_lazperf()
 	pal = pc_patch_lazperf_from_pointlist(pl);
 
 	// assign a valid schema to the patch
-	pat = pc_patch_set_schema((PCPATCH*) pal, simplexyzschema);
+	pat = pc_patch_set_schema((PCPATCH*) pal, simpleschema_nointensity);
 	str = pc_patch_to_string(pat);
 
 	CU_ASSERT(pat != NULL);
@@ -1209,7 +1209,7 @@ test_patch_set_schema_dimensional_compression(enum DIMCOMPRESSIONS dimcomp)
 	padim2 = pc_patch_dimensional_compress(padim1, stats);
 
 	// assign a valid schema to the patch
-	pat = pc_patch_set_schema((PCPATCH*) padim2, simplexyzschema);
+	pat = pc_patch_set_schema((PCPATCH*) padim2, simpleschema_nointensity);
 
 	pt = pc_patch_pointn(pat, 1);
 	str = pc_point_to_string(pt);
