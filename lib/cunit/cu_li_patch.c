@@ -9,24 +9,24 @@
 
 /* GLOBALS ************************************************************/
 
-static PCSCHEMA *simplexyzschema = NULL;
-static const char *simplexyzxmlfile = "data/simple-schema-xyz.xml";
+static PCSCHEMA *simpleschema = NULL;
+static const char *simplexmlfile = "data/simple-schema.xml";
 
 /* Setup/teardown for this suite */
 static int
 init_suite(void)
 {
-	char *xmlstr = file_to_str(simplexyzxmlfile);
-	simplexyzschema = pc_schema_from_xml(xmlstr);
+	char *xmlstr = file_to_str(simplexmlfile);
+	simpleschema = pc_schema_from_xml(xmlstr);
 	pcfree(xmlstr);
-	if ( !simplexyzschema ) return 1;
+	if ( !simpleschema ) return 1;
 	return 0;
 }
 
 static int
 clean_suite(void)
 {
-	pc_schema_free(simplexyzschema);
+	pc_schema_free(simpleschema);
 	return 0;
 }
 
@@ -46,7 +46,7 @@ test_patch_rotate_quaternion_compression_none()
 
 	// (1, 1, 1) is the point we're going to rotate
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_x(pt, 1.0);
 	pc_point_set_y(pt, 1.0);
 	pc_point_set_z(pt, 1.0);
@@ -152,7 +152,7 @@ test_patch_rotate_quaternion_compression_none_with_dimension_names()
 
 	// (1, 1, 1) is the point we're going to rotate
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_double_by_name(pt, "x", 1.0);
 	pc_point_set_double_by_name(pt, "y", 1.0);
 	pc_point_set_double_by_name(pt, "z", 1.0);
@@ -203,7 +203,7 @@ test_patch_rotate_quaternion_compression_ght()
 
 	// (1, 1, 1) is the point we're going to rotate
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_x(pt, 1.0);
 	pc_point_set_y(pt, 1.0);
 	pc_point_set_z(pt, 1.0);
@@ -306,7 +306,7 @@ test_patch_translate_compression_none()
 
 	// (1, 1, 1) is the point we're going to translate
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_x(pt, 1.0);
 	pc_point_set_y(pt, 1.0);
 	pc_point_set_z(pt, 1.0);
@@ -355,7 +355,7 @@ test_patch_translate_compression_none_with_dimension_names()
 
 	// (1, 1, 1) is the point we're going to translate
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_double_by_name(pt, "x", 1.0);
 	pc_point_set_double_by_name(pt, "y", 1.0);
 	pc_point_set_double_by_name(pt, "z", 1.0);
@@ -402,7 +402,7 @@ test_patch_translate_compression_ght()
 
 	// (1, 1, 1) is the point we're going to translate
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_x(pt, 1.0);
 	pc_point_set_y(pt, 1.0);
 	pc_point_set_z(pt, 1.0);
@@ -450,7 +450,7 @@ test_patch_affine_compression_none()
 
 	// (1, 1, 1) is the point we're going to transform
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_x(pt, 1.0);
 	pc_point_set_y(pt, 1.0);
 	pc_point_set_z(pt, 1.0);
@@ -510,7 +510,7 @@ test_patch_affine_compression_none_with_dimension_names()
 
 	// (1, 1, 1) is the point we're going to transform
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_double_by_name(pt, "x", 1.0);
 	pc_point_set_double_by_name(pt, "y", 1.0);
 	pc_point_set_double_by_name(pt, "z", 1.0);
@@ -568,7 +568,7 @@ test_patch_affine_compression_ght()
 
 	// (1, 1, 1) is the point we're going to transform
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_x(pt, 1.0);
 	pc_point_set_y(pt, 1.0);
 	pc_point_set_z(pt, 1.0);
@@ -627,7 +627,7 @@ test_patch_projective_compression_none()
 
 	// (1, 1, -2) is the point we're going to transform
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_x(pt, 1.0);
 	pc_point_set_y(pt, 1.0);
 	pc_point_set_z(pt, -2.0);
@@ -677,7 +677,7 @@ test_patch_projective_compression_none_with_dimension_names()
 
 	// (1, 1, -2) is the point we're going to transform
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_double_by_name(pt, "x", 1.0);
 	pc_point_set_double_by_name(pt, "y", 1.0);
 	pc_point_set_double_by_name(pt, "z", -2.0);
@@ -725,7 +725,7 @@ test_patch_projective_compression_ght()
 
 	// (1, 1, -2) is the point we're going to transform
 	pl = pc_pointlist_make(1);
-	pt = pc_point_make(simplexyzschema);
+	pt = pc_point_make(simpleschema);
 	pc_point_set_x(pt, 1.0);
 	pc_point_set_y(pt, 1.0);
 	pc_point_set_z(pt, -2.0);
