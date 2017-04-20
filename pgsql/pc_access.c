@@ -691,12 +691,16 @@ Datum pcpatch_range(PG_FUNCTION_ARGS)
 	PCSCHEMA *schema = pc_schema_from_pcid(serpa->pcid, fcinfo);
 	PCPATCH *patch = pc_patch_deserialize(serpa, schema);
 	PCPATCH *patchout = NULL;
-	if(patch) {
+	if ( patch )
+	{
 		patchout = pc_patch_range(patch, first, count);
-		pc_patch_free(patch);
+		if ( patchout != patch )
+			pc_patch_free(patch);
 	}
-	if(!patchout) PG_RETURN_NULL();
+	if ( !patchout )
+		PG_RETURN_NULL();
 	serpaout = pc_patch_serialize(patchout, NULL);
+	pc_patch_free(patchout);
 	PG_RETURN_POINTER(serpaout);
 }
 

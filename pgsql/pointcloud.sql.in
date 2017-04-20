@@ -194,8 +194,8 @@ CREATE OR REPLACE FUNCTION PC_AsText(p pcpatch)
 	RETURNS text AS 'MODULE_PATHNAME', 'pcpatch_as_text'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION PC_Envelope(p pcpatch)
-	RETURNS bytea AS 'MODULE_PATHNAME', 'pcpatch_bytea_envelope'
+CREATE OR REPLACE FUNCTION PC_EnvelopeAsBinary(p pcpatch)
+	RETURNS bytea AS 'MODULE_PATHNAME', 'pcpatch_envelope_as_bytea'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION PC_Uncompress(p pcpatch)
@@ -326,6 +326,10 @@ CREATE OR REPLACE FUNCTION PC_SetPCID(p pcpatch, pcid int4)
 	RETURNS pcpatch AS 'MODULE_PATHNAME', 'pcpatch_setpcid'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION PC_BoundingDiagonalAsBinary(p pcpatch)
+	RETURNS bytea AS 'MODULE_PATHNAME', 'pcpatch_bounding_diagonal_as_bytea'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
 -------------------------------------------------------------------
 --  POINTCLOUD_COLUMNS
 -------------------------------------------------------------------
@@ -374,11 +378,11 @@ CREATE CAST (pcpoint AS pcpoint) WITH FUNCTION pcpoint(pcpoint, integer, boolean
 
 CREATE OR REPLACE FUNCTION pointcloud_abs_in(cstring)
 	RETURNS pointcloud_abs AS 'MODULE_PATHNAME'
-	LANGUAGE 'c';
+	LANGUAGE 'c' IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION pointcloud_abs_out(pointcloud_abs)
 	RETURNS cstring AS 'MODULE_PATHNAME'
-	LANGUAGE 'c';
+	LANGUAGE 'c' IMMUTABLE STRICT;
 
 CREATE TYPE pointcloud_abs (
 	internallength = 8,

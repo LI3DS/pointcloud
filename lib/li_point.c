@@ -31,8 +31,8 @@ li_point_rotate_quaternion(
 	}
 	else
 	{
-		assert(schema->x_position >= 0);
-		xdim = pc_schema_get_dimension(schema, schema->x_position);
+		assert(schema->xdim);
+		xdim = schema->xdim;
 	}
 	if ( ydimname )
 	{
@@ -40,16 +40,16 @@ li_point_rotate_quaternion(
 	}
 	else
 	{
-		assert(schema->y_position >= 0);
-		ydim = pc_schema_get_dimension(schema, schema->y_position);
+		assert(schema->ydim);
+		ydim = schema->ydim;
 	}
 	if ( zdimname )
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}
-	else if ( schema->z_position >= 0 )
+	else if ( schema->zdim )
 	{
-		zdim = pc_schema_get_dimension(schema, schema->z_position);
+		zdim = schema->zdim;
 	}
 	else
 	{
@@ -91,8 +91,8 @@ li_point_translate(
 	}
 	else
 	{
-		assert(schema->x_position >= 0);
-		xdim = pc_schema_get_dimension(schema, schema->x_position);
+		assert(schema->xdim);
+		xdim = schema->xdim;
 	}
 	if ( ydimname )
 	{
@@ -100,16 +100,16 @@ li_point_translate(
 	}
 	else
 	{
-		assert(schema->y_position >= 0);
-		ydim = pc_schema_get_dimension(schema, schema->y_position);
+		assert(schema->ydim);
+		ydim = schema->ydim;
 	}
 	if ( zdimname )
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}
-	else if ( schema->z_position >= 0 )
+	else if ( schema->zdim )
 	{
-		zdim = pc_schema_get_dimension(schema, schema->z_position);
+		zdim = schema->zdim;
 	}
 	else
 	{
@@ -154,8 +154,8 @@ li_point_affine(
 	}
 	else
 	{
-		assert(schema->x_position >= 0);
-		xdim = pc_schema_get_dimension(schema, schema->x_position);
+		assert(schema->xdim);
+		xdim = schema->xdim;
 	}
 	if ( ydimname )
 	{
@@ -163,16 +163,16 @@ li_point_affine(
 	}
 	else
 	{
-		assert(schema->y_position >= 0);
-		ydim = pc_schema_get_dimension(schema, schema->y_position);
+		assert(schema->ydim);
+		ydim = schema->ydim;
 	}
 	if ( zdimname )
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}
-	else if ( schema->z_position >= 0 )
+	else if ( schema->zdim )
 	{
-		zdim = pc_schema_get_dimension(schema, schema->z_position);
+		zdim = schema->zdim;
 	}
 	else
 	{
@@ -219,8 +219,8 @@ li_point_projective(
 	}
 	else
 	{
-		assert(schema->x_position >= 0);
-		xdim = pc_schema_get_dimension(schema, schema->x_position);
+		assert(schema->xdim);
+		xdim = schema->xdim;
 	}
 	if ( ydimname )
 	{
@@ -228,16 +228,16 @@ li_point_projective(
 	}
 	else
 	{
-		assert(schema->y_position >= 0);
-		ydim = pc_schema_get_dimension(schema, schema->y_position);
+		assert(schema->ydim);
+		ydim = schema->ydim;
 	}
 	if ( zdimname )
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}
-	else if ( schema->z_position >= 0 )
+	else if ( schema->zdim )
 	{
-		zdim = pc_schema_get_dimension(schema, schema->z_position);
+		zdim = schema->zdim;
 	}
 	else
 	{

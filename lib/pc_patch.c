@@ -522,72 +522,66 @@ pc_patch_from_patchlist(PCPATCH **palist, int numpatches)
 	return (PCPATCH*)paout;
 }
 
-// first: the first element to select.
-// count: the number of element to select from the first one.
+// first: the first element to select (1-based indexing)
+// count: the number of points to select
 PCPATCH *
 pc_patch_range(const PCPATCH *pa, int first, int count)
 {
-	PCPATCH_UNCOMPRESSED *paout;
+	PCPATCH_UNCOMPRESSED *paout, *pu;
+	int countmax;
 	uint8_t *buf;
 	size_t size;
 	size_t start;
 
 	assert(pa);
 
-	if(first+count > pa->npoints)
-		count = pa->npoints - first;
-	if ( count <= 0 )
+	first--;
+	countmax = pa->npoints - first;
+
+	if ( count > countmax )
+		count = countmax;
+
+	if ( first < 0 || count <= 0 )
 		return NULL;
 
+	if ( count == pa->npoints )
+		return (PCPATCH *) pa;
+
 	paout = pc_patch_uncompressed_make(pa->schema, count);
-	buf = paout->data;
+	if ( !paout )
+		return NULL;
 	paout->npoints = count;
+
+	pu = (PCPATCH_UNCOMPRESSED *) pc_patch_uncompress(pa);
+	if ( !pu )
+	{
+		pc_patch_free((PCPATCH *) paout);
+		return NULL;
+	}
+
+	buf = paout->data;
 	start = pa->schema->size * first;
 	size = pa->schema->size * count;
 
-	switch( pa->type )
-	{
-	case PC_NONE:
-	{
-		PCPATCH_UNCOMPRESSED *pu = (PCPATCH_UNCOMPRESSED*)pa;
-		memcpy(buf, pu->data + start, size);
-		break;
-	}
-	case PC_DIMENSIONAL:
-	{
-		PCPATCH_UNCOMPRESSED *pu = pc_patch_uncompressed_from_dimensional((const PCPATCH_DIMENSIONAL*)pa);
-		memcpy(buf, pu->data + start, size);
-		pc_patch_free((PCPATCH*)pu);
-		break;
-	}
-	case PC_GHT:
-	{
-		PCPATCH_UNCOMPRESSED *pu = pc_patch_uncompressed_from_ght((const PCPATCH_GHT*)pa);
-		memcpy(buf, pu->data + start, size);
-		pc_patch_free((PCPATCH*)pu);
-		break;
-	}
-	case PC_LAZPERF:
-	{
-		PCPATCH_UNCOMPRESSED *pu = pc_patch_uncompressed_from_lazperf((const PCPATCH_LAZPERF*)pa);
-		memcpy(buf, pu->data + start, size);
-		pc_patch_free((PCPATCH*)pu);
-		break;
-	}
-	default:
-	{
-		pcerror("%s: unknown compression type (%d)", __func__, pa->type);
-		break;
-	}
-	}
+	memcpy(buf, pu->data + start, size);
 
+	if ( ((PCPATCH *) pu) != pa )
+		pc_patch_free((PCPATCH *) pu);
+
+	if ( PC_FAILURE == pc_patch_uncompressed_compute_extent(paout) )
+	{
+		pcerror("%s: extent computation failed", __func__);
+		pc_patch_free((PCPATCH *) paout);
+		return NULL;
+	}
 	if ( PC_FAILURE == pc_patch_uncompressed_compute_stats(paout) )
 	{
 		pcerror("%s: stats computation failed", __func__);
+		pc_patch_free((PCPATCH *) paout);
 		return NULL;
 	}
 
-	return (PCPATCH*) paout;
+	return (PCPATCH *) paout;
 }
 
 /** get point n from patch */
@@ -608,6 +602,8 @@ PCPOINT *pc_patch_pointn(const PCPATCH *patch, int n)
 		return pc_patch_dimensional_pointn((PCPATCH_DIMENSIONAL*)patch,n);
 	case PC_GHT:
 		return pc_patch_ght_pointn((PCPATCH_GHT*)patch,n);
+	case PC_LAZPERF:
+		return pc_patch_lazperf_pointn((PCPATCH_LAZPERF*)patch, n);
 	}
 	pcerror("%s: unsupported compression %d requested", __func__, patch->type);
 	return NULL;
