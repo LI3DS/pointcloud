@@ -154,12 +154,17 @@ test_dimension_byteoffsets()
 }
 
 static void
-test_schema_invalid_xy()
+test_schema_xdim_only()
 {
 	// See https://github.com/pgpointcloud/pointcloud/issues/28
 	char *xmlstr = "<pc:PointCloudSchema xmlns:pc='x'><pc:dimension>1</pc:dimension></pc:PointCloudSchema>";
 	PCSCHEMA *myschema = pc_schema_from_xml(xmlstr);
-	CU_ASSERT_PTR_NULL(myschema);
+	CU_ASSERT_PTR_NOT_NULL(myschema);
+	CU_ASSERT_PTR_NULL(myschema->xdim);
+	CU_ASSERT_PTR_NULL(myschema->ydim);
+	CU_ASSERT_PTR_NULL(myschema->zdim);
+	CU_ASSERT_PTR_NULL(myschema->mdim);
+	pc_schema_free(myschema);
 }
 
 static void
@@ -315,7 +320,7 @@ CU_TestInfo schema_tests[] = {
 	PC_TEST(test_dimension_get),
 	PC_TEST(test_dimension_byteoffsets),
 	PC_TEST(test_schema_compression),
-	PC_TEST(test_schema_invalid_xy),
+	PC_TEST(test_schema_xdim_only),
 	PC_TEST(test_schema_missing_dimension),
 	PC_TEST(test_schema_empty),
 	PC_TEST(test_schema_clone),
