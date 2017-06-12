@@ -15,6 +15,7 @@ typedef double LIMAT33[9];
 typedef double LIMAT43[12];
 typedef double LIMAT44[16];
 typedef LIVEC3 LIBOX3[2];
+typedef LIVEC4 LIBOX4[2];
 
 typedef struct
 {

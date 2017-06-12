@@ -65,4 +65,9 @@ FROM (
 SELECT ST_AsText(PC_EnvelopeGeometry(pa)), ST_AsText(PC_FrustumAsGeom(pa)) FROM pa_test_frustum_li3ds;
 
 DROP TABLE pa_test_frustum_li3ds;
+
+SELECT 'BOX4D(1.0 1.0 1.0 1.0,2.0 2.0 2.0 2.0)'::LIBOX4D;
+SELECT 'BOX4D(1.0 1.0 1.0,2.0 2.0 2.0)'::LIBOX4D;
+SELECT 'BOX4D(1.0 1.0,2.0 2.0)'::LIBOX4D;
+
 TRUNCATE pointcloud_formats;
