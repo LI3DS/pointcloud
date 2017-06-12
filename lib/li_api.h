@@ -63,6 +63,11 @@ PCPATCH *li_patch_affine(const PCPATCH *patch, double a, double b, double c, dou
 /** apply a projective transformation to a patch */
 PCPATCH *li_patch_projective(const PCPATCH *patch, double a, double b, double c, double d, double e, double f, double g, double h, double i, double j, double k, double l, double m, double n, double o, double p, const char *xdimname, const char *ydimname, const char *zdimname);
 
+/**********************************************************************
+* LIBOX4
+*/
+LIBOX4 *li_box4d_affine(LIBOX4 ibox, double a, double b, double c, double d, double e, double f, double g, double h, double i, double xoff, double yoff, double zoff);
+
 /** convert a box to a frustum (lossless) */
 int li_frustum_from_box(LIFRUSTUM *res, const LIBOX3 b);
 

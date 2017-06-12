@@ -20,6 +20,7 @@ OBJS =	\
 	cu_pc_util.o
 
 OBJS += \
+	cu_li_box4d.o \
 	cu_li_frustum.o \
 	cu_li_matrix.o \
 	cu_li_patch.o \

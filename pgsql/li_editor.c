@@ -22,6 +22,30 @@ Datum lipoint_translate(PG_FUNCTION_ARGS);
 Datum lipoint_affine(PG_FUNCTION_ARGS);
 Datum lipoint_projective(PG_FUNCTION_ARGS);
 
+static float8* li_getarg_float8_array(FunctionCallInfoData *fcinfo, int pos, int num_elts)
+{
+	ArrayType *array = PG_GETARG_ARRAYTYPE_P(pos);
+
+	if ( ARR_ELEMTYPE(array) != FLOAT8OID ) {
+		elog(ERROR, "array must be of type float8[]");
+		return NULL;
+	}
+	if ( ARR_NDIM(array) != 1 ) {
+		elog(ERROR, "array array must have only one dimension");
+		return NULL;
+	}
+	if ( ARR_HASNULL(array) ) {
+		elog(ERROR, "array array must not have null elements");
+		return NULL;
+	}
+	if ( ARR_DIMS(array)[0] != num_elts ) {
+		elog(ERROR, "array array must have %d elements", num_elts);
+		return NULL;
+	}
+
+	return (float8 *) ARR_DATA_PTR(array);
+}
+
 /**
 * Rotate a patch based on a rotation quaternion
 * PC_RotateQuaternion(patch pcpatch, qw float8, qx float8, qy float8, qz float8,
@@ -464,4 +488,35 @@ Datum lipoint_projective(PG_FUNCTION_ARGS)
 	pc_point_free(point);
 
 	PG_RETURN_POINTER(serpoint);
+}
+
+/**
+* Apply an affine transformation to a box4d
+* PC_Affine(box libox4d, mat33 float8[9], off float8[3]) returns libox4d
+*/
+PG_FUNCTION_INFO_V1(libox4d_affine);
+Datum libox4d_affine(PG_FUNCTION_ARGS)
+{
+	LIBOX4 *ibox, *obox;
+	float8 *mat33, *vec3;
+
+	if ( PG_ARGISNULL(0) )
+		PG_RETURN_NULL();	/* returns null if no input values */
+
+	ibox = (LIBOX4 *) PG_GETARG_POINTER(0);
+
+	mat33 = li_getarg_float8_array(fcinfo, 1, 9);
+	if ( ! mat33 )
+		PG_RETURN_NULL();
+	vec3 = li_getarg_float8_array(fcinfo, 2, 3);
+	if ( ! vec3 )
+		PG_RETURN_NULL();
+
+	obox = li_box4d_affine(*ibox,
+		mat33[0], mat33[1], mat33[2],
+		mat33[3], mat33[4], mat33[5],
+		mat33[6], mat33[7], mat33[8],
+		vec3[0], vec3[1], vec3[2]);
+
+	PG_RETURN_POINTER(obox);
 }

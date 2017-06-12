@@ -528,3 +528,7 @@ CREATE TYPE libox4d (
 	input = libox4d_in,
 	output = libox4d_out
 );
+
+CREATE OR REPLACE FUNCTION PC_Affine(box libox4d, mat33 float8[9], vec3 float8[3])
+	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_affine'
+	LANGUAGE 'c' IMMUTABLE STRICT;

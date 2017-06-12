@@ -16,6 +16,7 @@ set (PC_TEST_SOURCES
   )
 
 set (LI_TEST_SOURCES
+  cu_li_box4d.c
   cu_li_frustum.c
   cu_li_matrix.c
   cu_li_patch.c
