@@ -335,6 +335,7 @@ void pc_schema_check_xyzm(PCSCHEMA *s)
 		char *dimname = s->dims[i]->name;
 		if ( ! dimname ) continue;
 		if ( strcasecmp(dimname, "X") == 0 ||
+			 strcasecmp(dimname, "transform.translation[0]") == 0 ||
 			 strcasecmp(dimname, "Longitude") == 0 ||
 			 strcasecmp(dimname, "Lon") == 0 )
 		{
@@ -342,6 +343,7 @@ void pc_schema_check_xyzm(PCSCHEMA *s)
 			continue;
 		}
 		if ( strcasecmp(dimname, "Y") == 0 ||
+			 strcasecmp(dimname, "transform.translation[1]") == 0 ||
 			 strcasecmp(dimname, "Latitude") == 0 ||
 			 strcasecmp(dimname, "Lat") == 0 )
 		{
@@ -349,7 +351,10 @@ void pc_schema_check_xyzm(PCSCHEMA *s)
 			continue;
 		}
 		if ( strcasecmp(dimname, "Z") == 0 ||
+			 strcasecmp(dimname, "transform.translation[2]") == 0 ||
 			 strcasecmp(dimname, "H") == 0 ||
+			 strcasecmp(dimname, "Altitude") == 0 ||
+			 strcasecmp(dimname, "Alt") == 0 ||
 			 strcasecmp(dimname, "Height") == 0 )
 		{
 			s->zdim = s->dims[i];
@@ -357,6 +362,7 @@ void pc_schema_check_xyzm(PCSCHEMA *s)
 		}
 		if ( strcasecmp(dimname, "M") == 0 ||
 			 strcasecmp(dimname, "T") == 0 ||
+			 strcasecmp(dimname, "Measure") == 0 ||
 			 strcasecmp(dimname, "Time") == 0 ||
 			 strcasecmp(dimname, "GPSTime") == 0 )
 		{
