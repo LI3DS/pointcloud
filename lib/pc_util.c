@@ -300,6 +300,9 @@ pc_bounding_diagonal_wkb_from_bounds(
 	uint32_t wkbtype;
 	size_t size;
 
+	if ( !schema->xdim || !schema->ydim )
+		return NULL;
+
 	wkbtype = 2; /* WKB LINESTRING */
 	size = 1 + 4 + 4 + (2 * 2 * 8); /* endian + type + npoints + 2 dbl pts */
 
@@ -345,6 +348,9 @@ pc_bounding_diagonal_wkb_from_stats(const PCSTATS *stats, size_t *wkbsize)
 	uint32_t wkbtype;
 	size_t size;
 	double val;
+
+	if ( !schema->xdim || !schema->ydim )
+		return NULL;
 
 	wkbtype = 2; /* WKB LINESTRING */
 	size = 1 + 4 + 4 + (2 * 2 * 8); /* endian + type + npoints + 2 dbl pts */
