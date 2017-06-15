@@ -324,7 +324,7 @@ pc_patch_from_wkb(const PCSCHEMA *s, uint8_t *wkb, size_t wkbsize)
 	* schema compression at this point. The schema compression is only
 	* forced at serialization time.
 	*/
-	pcid = wkb_get_pcid(wkb);
+	pcid = pc_wkb_get_pcid(wkb);
 	compression = wkb_get_compression(wkb);
 
 	if ( pcid != s->pcid )
@@ -609,50 +609,200 @@ PCPOINT *pc_patch_pointn(const PCPATCH *patch, int n)
 	return NULL;
 }
 
+static void
+pc_patch_point_set(
+		PCPOINT *p, const uint8_t *data, PCDIMENSION **dims, const uint8_t *def)
+{
+	size_t i;
+	for ( i = 0; i < p->schema->ndims; i++ )
+	{
+		const PCDIMENSION *ddim = dims[i];
+		const PCDIMENSION *pdim = p->schema->dims[i];
+		uint8_t *pdata = p->data + pdim->byteoffset;
+		const uint8_t *ddata = ddim ?
+			data + ddim->byteoffset : def + pdim->byteoffset;
+		memcpy(pdata, ddata, pdim->size);
+	}
+}
+
+
 /** set schema for patch */
 PCPATCH*
-pc_patch_set_schema(const PCPATCH *patch, const PCSCHEMA *new_schema)
+pc_patch_set_schema(PCPATCH *patch, const PCSCHEMA *new_schema, double def)
 {
-	PCPATCH_UNCOMPRESSED *paout = NULL;
-	PCPOINTLIST *opl, *npl;
-	PCPOINT *opt, *npt;
-	double val;
+	PCDIMENSION** new_dimensions = new_schema->dims;
+	PCDIMENSION* old_dimensions[new_schema->ndims];
+	const PCSCHEMA *old_schema = patch->schema;
+	PCPATCH_UNCOMPRESSED *paout;
+	PCPOINT opt, npt;
+	PCPATCH *pain;
+	PCPOINT *dpt;
 	size_t i, j;
-	char *name;
-	PCDIMENSION *dim;
-	const PCSCHEMA *old_schema;
 
-	old_schema = patch->schema;
+	// create a point for storing the default values
+	dpt = pc_point_make(new_schema);
 
-	// init point lists
-	opl = pc_pointlist_from_patch(patch);
-	npl = pc_pointlist_make(patch->npoints);
-
-	// build the new pointlist
-	for ( i = 0; i <patch->npoints; i++ )
+	for ( j = 0; j < new_schema->ndims; j++ )
 	{
-		opt = pc_pointlist_get_point(opl, i);
-		npt = pc_point_make(new_schema);
-
-		for ( j = 0; j < new_schema->ndims; j++ )
+		PCDIMENSION *ndim = new_dimensions[j];
+		PCDIMENSION *odim = pc_schema_get_dimension_by_name(
+				old_schema, ndim->name);
+		old_dimensions[j] = odim;
+		if ( odim )
 		{
-			name = new_schema->dims[j]->name;
-			dim = pc_schema_get_dimension_by_name(old_schema, name);
-
-			val = 0.0;
-			if ( dim != NULL )
-				pc_point_get_double(opt, dim, &val);
-
-			pc_point_set_double(npt, new_schema->dims[j], val);
+			if ( ndim->interpretation != odim->interpretation )
+			{
+				pcerror("dimension interpretations are not matching");
+				pc_point_free(dpt);
+				return NULL;
+			}
 		}
-
-		pc_pointlist_add_point(npl, npt);
+		else
+		{
+			pc_point_set_double(dpt, ndim, def);
+		}
 	}
 
-	paout = pc_patch_uncompressed_from_pointlist(npl);
+	pain = pc_patch_uncompress(patch);
+	paout = pc_patch_uncompressed_make(new_schema, patch->npoints);
+	paout->npoints = pain->npoints;
 
-	pc_pointlist_free(npl);
-	pc_pointlist_free(opl);
+	opt.schema = old_schema;
+	npt.schema = new_schema;
+	opt.readonly = PC_TRUE;
+	npt.readonly = PC_TRUE;
+
+	opt.data = ((PCPATCH_UNCOMPRESSED *) pain)->data;
+	npt.data = paout->data;
+
+	for ( i = 0; i < patch->npoints; i++ )
+	{
+		pc_patch_point_set(&npt, opt.data, old_dimensions, dpt->data);
+		opt.data += old_schema->size;
+		npt.data += new_schema->size;
+	}
+
+	if ( patch->stats )
+	{
+		paout->stats = pc_stats_new(new_schema);
+
+		opt.data = patch->stats->min.data;
+		npt.data = paout->stats->min.data;
+		pc_patch_point_set(&npt, opt.data, old_dimensions, dpt->data);
+
+		opt.data = patch->stats->max.data;
+		npt.data = paout->stats->max.data;
+		pc_patch_point_set(&npt, opt.data, old_dimensions, dpt->data);
+
+		opt.data = patch->stats->avg.data;
+		npt.data = paout->stats->avg.data;
+		pc_patch_point_set(&npt, opt.data, old_dimensions, dpt->data);
+
+		pc_point_get_x(&paout->stats->min, &paout->bounds.xmin);
+		pc_point_get_y(&paout->stats->min, &paout->bounds.ymin);
+		pc_point_get_x(&paout->stats->max, &paout->bounds.xmax);
+		pc_point_get_y(&paout->stats->max, &paout->bounds.ymax);
+	}
+	else
+	{
+		double xscale = npt.schema->xdim->scale / opt.schema->xdim->scale;
+		double yscale = npt.schema->ydim->scale / opt.schema->ydim->scale;
+		double xoffset = npt.schema->xdim->offset - opt.schema->xdim->offset;
+		double yoffset = npt.schema->ydim->offset - opt.schema->ydim->offset;
+
+		paout->bounds.xmin = patch->bounds.xmin * xscale + xoffset;
+		paout->bounds.xmax = patch->bounds.xmax * xscale + xoffset;
+		paout->bounds.ymin = patch->bounds.ymin * yscale + yoffset;
+		paout->bounds.xmax = patch->bounds.ymax * yscale + yoffset;
+	}
+
+	pc_point_free(dpt);
+
+	if ( pain != patch )
+		pc_patch_free(pain);
+
+	return (PCPATCH*) paout;
+}
+
+
+/**
+* Read all the points from "patch", and transform them based on "new_schema".
+* Return a new patch with the transformed points.
+*/
+PCPATCH*
+pc_patch_transform(const PCPATCH *patch, const PCSCHEMA *new_schema, double def)
+{
+	PCDIMENSION** new_dimensions = new_schema->dims;
+	PCDIMENSION* old_dimensions[new_schema->ndims];
+	const PCSCHEMA *old_schema = patch->schema;
+	PCPATCH_UNCOMPRESSED *paout;
+	PCPOINT opt, npt;
+	PCPATCH *pain;
+	size_t i, j;
+
+	if ( old_schema->srid != new_schema->srid )
+	{
+		pcwarn("old and new schemas have different srids, and data "
+			   "reprojection is not yet supported");
+		return NULL;
+	}
+
+	for ( j = 0; j < new_schema->ndims; j++ )
+	{
+		PCDIMENSION *ndim = new_dimensions[j];
+		PCDIMENSION *odim = pc_schema_get_dimension_by_name(
+				old_schema, ndim->name);
+		old_dimensions[j] = odim;
+	}
+
+	pain = pc_patch_uncompress(patch);
+
+	paout = pc_patch_uncompressed_make(new_schema, patch->npoints);
+	paout->npoints = pain->npoints;
+
+	opt.schema = old_schema;
+	npt.schema = new_schema;
+	opt.readonly = PC_TRUE;
+	npt.readonly = PC_TRUE;
+
+	opt.data = ((PCPATCH_UNCOMPRESSED *) pain)->data;
+	npt.data = paout->data;
+
+	// reinterpret the data and fill the output patch
+	//
+	// TODO: for the case where the old and new dimension sets don't intersect (all
+	// the values in old_dimensions are NULL) a faster path could probably be used
+	for ( i = 0; i <patch->npoints; i++ )
+	{
+		for ( j = 0; j < new_schema->ndims; j++ )
+		{
+			// pc_point_get_double returns immediately w/o changing val if the
+			// dimension it is passed is NULL
+			double val = def;
+			pc_point_get_double(&opt, old_dimensions[j], &val);
+			pc_point_set_double(&npt, new_dimensions[j], val);
+		}
+
+		opt.data += old_schema->size;
+		npt.data += new_schema->size;
+	}
+
+	if ( pain != patch )
+		pc_patch_free(pain);
+
+	if ( PC_FAILURE == pc_patch_uncompressed_compute_extent(paout) )
+	{
+		pcerror("%s: failed to compute patch extent", __func__);
+		pc_patch_free((PCPATCH *)paout);
+		return NULL;
+	}
+
+	if ( PC_FAILURE == pc_patch_uncompressed_compute_stats(paout) )
+	{
+		pcerror("%s: failed to compute patch stats", __func__);
+		pc_patch_free((PCPATCH *)paout);
+		return NULL;
+	}
 
 	return (PCPATCH*) paout;
 }

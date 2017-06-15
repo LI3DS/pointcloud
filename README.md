@@ -45,6 +45,10 @@ After generating the configure script with ``autogen``,  ``./configure --help`` 
 - ``make``
 - ``sudo make install``
 
+Note: you can use ``--with-pgconfig`` on the ``./configure`` command line if you have multiple PostgreSQL installations on your system and want to target a specific one. For example:
+
+- ``./configure --with-pgconfig=/sur/lib/postgresql/9.5/bin/pg_config``
+
 Run unit tests:
 
 - ``make check``
@@ -494,9 +498,19 @@ Now that you have created two tables, you'll see entries for them in the `pointc
 
 > Returns a patch containing *n* points. These points are selected from the *start*-th point with 1-based indexing.
 
-**PC_SetPCID(p pcpatch, pcid int4)** returns **pcpatch**
+**PC_SetPCId(p pcpatch, pcid int4, def float8 default 0.0)** returns **pcpatch**
 
-> Sets the schema on a PcPatch, given a valid `pcid` schema number. The internal values of the points may change for dimensions where the offset and/or scale are different between the "old" and the "new" schema, so that the corresponding double values are unchanged, up to the precision of the underlying representation. Also, 0 values will be used for dimensions that are in the new schema but not in the old schema. And the values of dimensions that are in the old schema but not in the new schema will be discarded.
+> Sets the schema on a PcPatch, given a valid `pcid` schema number.
+>
+> For dimensions that are in the "new" schema but not in the "old" schema the value `def` is set in the points of the output patch. `def` is optional, its default value is `0.0`.
+
+**PC_Transform(p pcpatch, pcid int4, def float8 default 0.0)** returns **pcpatch**
+
+> Returns a new patch with its data transformed based on the schema whose identifier is `pcid`.
+>
+> For dimensions that are in the "new" schema but not in the "old" schema the value `def` is set in the points of the output patch. `def` is optional, its default value is `0.0`.
+>
+> Contrary to `PC_SetPCId`, `PC_Transform` may change (transform) the patch data if dimension interpretations, scales or offsets are different in the new schema.
 
 **PC_RotateQuaternion(p pcpatch, qw float8, qx float8, qy float8, qz float8, xdimname text, ydimname text, zdimname text)** returns **pcpatch**
 
@@ -539,6 +553,8 @@ Now that you have created two tables, you'll see entries for them in the `pointc
 >     14ae4781464090c2f5285cbf5fc0ec51b81e858b46400ad7
 >     a3703dba5fc0ec51b81e858b46400ad7a3703dba5fc0e17a
 >     14ae4781464090c2f5285cbf5fc0e17a14ae47814640
+>
+> **PC_Envelope** is an alias to **PC_EnvelopeBinary**. But **PC_Envelope** is deprecated and will be removed in a future version (2.0) of the extension. **PC_EnvelopeAsBinary** is to be used instead.
 
 **PC_BoundingDiagonalAsBinary(p pcpatch)** returns **bytea**
 
@@ -599,22 +615,22 @@ The `pointcloud_postgis` extension adds functions that allow you to use PostgreS
 > 
 >     POINT Z (-127 45 124)
 
-**PC_Envelope(pcpatch)** returns **geometry**
+**PC_EnvelopeGeometry(pcpatch)** returns **geometry**
 
 > Returns the 2D *bounds* of the patch as a PostGIS Polygon 2D.
 > Useful for performing 2D intersection tests with PostGIS geometries.
 >
->     SELECT ST_AsText(PC_Envelope(pa)) FROM patches LIMIT 1;
+>     SELECT ST_AsText(PC_EnvelopeGeometry(pa)) FROM patches LIMIT 1;
 >
 >     POLYGON((-126.99 45.01,-126.99 45.09,-126.91 45.09,-126.91 45.01,-126.99 45.01))
 
-**PC_BoundingDiagonal(pcpatch)** returns **geometry**
+**PC_BoundingDiagonalGeometry(pcpatch)** returns **geometry**
 
 > Returns the bounding diagonal of a patch. This is a LineString (2D), a LineString Z or a LineString M or a LineString ZM, based on the existence of the Z and M dimensions in the patch. This function is useful for creating an index on a patch column.
 >
->     SELECT ST_AsText(PC_BoundingDiagonal(pa)) FROM patches;
+>     SELECT ST_AsText(PC_BoundingDiagonalGeometry(pa)) FROM patches;
 >                       st_astext
->    ------------------------------------------------
+>     ------------------------------------------------
 >     LINESTRING Z (-126.99 45.01 1,-126.91 45.09 9)
 >     LINESTRING Z (-126 46 100,-126 46 100)
 >     LINESTRING Z (-126.2 45.8 80,-126.11 45.89 89)
@@ -626,11 +642,10 @@ The `pointcloud_postgis` extension adds functions that allow you to use PostgreS
 >     LINESTRING Z (-126.9 45.1 10,-126.81 45.19 19)
 >     LINESTRING Z (-126.7 45.3 30,-126.61 45.39 39)
 >     LINESTRING Z (-126.1 45.9 90,-126.01 45.99 99)
->    (11 rows)gq
 >
 > For example, this is how one may want to create an index:
 >
->     CREATE INDEX ON patches USING GIST(PC_BoundingDiagonal(patch) gist_geometry_ops_nd);
+>     CREATE INDEX ON patches USING GIST(PC_BoundingDiagonalGeometry(patch) gist_geometry_ops_nd);
 
 ## Compressions ##
 
@@ -823,10 +838,10 @@ Here is a simple example pipeline that reads a LAS file and writes into a Postgr
     {
       "type":"filters.chipper",
       "capacity":400
-    }
+    },
     {
       "type":"writers.pgpointcloud",
-      "connection":"host='localhost' dbname='pc' user='lidar'",
+      "connection":"host='localhost' dbname='pc' user='lidar' password='lidar' port='5432'",
       "table":"sthsm",
       "compression":"dimensional",
       "srid":"26910"
@@ -844,7 +859,7 @@ Similarly, reading data from a PostgreSQL Pointcloud uses a Pointcloud reader an
   "pipeline":[
     {
       "type":"readers.pgpointcloud",
-      "connection":"host=localhost dbname='pc' user='lidar'",
+      "connection":"host='localhost' dbname='pc' user='lidar' password='lidar' port='5432'",
       "table":"sthsm",
       "column":"pa",
       "spatialreference":"EPSG:26910"
@@ -866,7 +881,7 @@ You can use the "where" option to restrict a read to just an envelope, allowing 
   "pipeline":[
     {
       "type":"readers.pgpointcloud",
-      "connection":"host=localhost dbname='pc' user='lidar'",
+      "connection":"host='localhost' dbname='pc' user='lidar' password='lidar' port='5432'",
       "table":"sthsm",
       "column":"pa",
       "spatialreference":"EPSG:26910",

@@ -140,7 +140,7 @@ test_patch_hex_in()
 	double d;
 	char *str;
 	size_t hexsize = strlen(hexbuf);
-	uint8_t *wkb = bytes_from_hexbytes(hexbuf, hexsize);
+	uint8_t *wkb = pc_bytes_from_hexbytes(hexbuf, hexsize);
 	PCPATCH *pa = pc_patch_from_wkb(simpleschema, wkb, hexsize/2);
 	PCPOINTLIST *pl = pc_pointlist_from_patch(pa);
 
@@ -204,7 +204,7 @@ test_patch_hex_out()
 	pa = pc_patch_uncompressed_from_pointlist(pl);
 	wkb = pc_patch_uncompressed_to_wkb(pa, &wkbsize);
 	// printf("wkbsize %zu\n", wkbsize);
-	hexwkb = hexbytes_from_bytes(wkb, wkbsize);
+	hexwkb = pc_hexbytes_from_bytes(wkb, wkbsize);
 
 	// printf("hexwkb %s\n", hexwkb);
 	// printf("hexresult_ndr %s\n", hexresult_ndr);
@@ -241,7 +241,7 @@ test_schema_xy()
 	*/
 	static char *hexpt = "01010000000AE9C90307A1100522A5000019000101010001067C9F1C4953C474650A0E412700390038001400000000000000876B6601962F750155320000";
 
-	uint8_t *bytes =  bytes_from_hexbytes(hexpt, strlen(hexpt));
+	uint8_t *bytes =  pc_bytes_from_hexbytes(hexpt, strlen(hexpt));
 	PCPOINT *pt;
 	double val;
 
@@ -480,7 +480,7 @@ test_patch_wkb()
 
 	pa1 = (PCPATCH*)pc_patch_dimensional_from_pointlist(pl1);
 	wkb1 = pc_patch_to_wkb(pa1, &z1);
-	// str = hexbytes_from_bytes(wkb1, z1);
+	// str = pc_hexbytes_from_bytes(wkb1, z1);
 	// printf("str\n%s\n",str);
 	pa2 = pc_patch_from_wkb(simpleschema, wkb1, z1);
 
@@ -618,7 +618,7 @@ test_patch_pointn_last_first()
 
 	char *hexbuf = "00000000000000000000000003000000080000000300000005000600000002000000030000000400080000000200000003000000040009";
 	size_t hexsize = strlen(hexbuf);
-	uint8_t *wkb = bytes_from_hexbytes(hexbuf, hexsize);
+	uint8_t *wkb = pc_bytes_from_hexbytes(hexbuf, hexsize);
 	char *str;
 
 	PCPATCH *pa = pc_patch_from_wkb(simpleschema, wkb, hexsize/2);
@@ -652,7 +652,7 @@ test_patch_pointn_no_compression()
 
 	char *hexbuf = "00000000000000000000000003000000080000000300000005000600000002000000030000000400080000000200000003000000040009";
 	size_t hexsize = strlen(hexbuf);
-	uint8_t *wkb = bytes_from_hexbytes(hexbuf, hexsize);
+	uint8_t *wkb = pc_bytes_from_hexbytes(hexbuf, hexsize);
 
 	PCPATCH *pa = pc_patch_from_wkb(simpleschema, wkb, hexsize/2);
 	PCPOINTLIST *li = pc_pointlist_from_patch(pa);
@@ -754,7 +754,7 @@ test_patch_pointn_ght_compression()
 
 	char *hexbuf = "00000000000000000000000003000000080000000300000005000600000002000000030000000400080000000200000003000000040009";
 	size_t hexsize = strlen(hexbuf);
-	uint8_t *wkb = bytes_from_hexbytes(hexbuf, hexsize);
+	uint8_t *wkb = pc_bytes_from_hexbytes(hexbuf, hexsize);
 
 	PCPATCH *pa = pc_patch_from_wkb(simpleschema, wkb, hexsize/2);
 	PCPOINTLIST *li = pc_pointlist_from_patch(pa);
@@ -788,7 +788,7 @@ test_patch_pointn_laz_compression()
 
 	char *hexbuf = "00000000000000000000000003000000080000000300000005000600000002000000030000000400080000000200000003000000040009";
 	size_t hexsize = strlen(hexbuf);
-	uint8_t *wkb = bytes_from_hexbytes(hexbuf, hexsize);
+	uint8_t *wkb = pc_bytes_from_hexbytes(hexbuf, hexsize);
 	char *str;
 
 	PCPATCH *pa = pc_patch_from_wkb(simpleschema, wkb, hexsize/2);
@@ -1040,48 +1040,6 @@ test_patch_set_schema_compression_none()
 {
 	// init data
 	PCPATCH_UNCOMPRESSED *pau;
-	PCPATCH *pat;
-	PCPOINTLIST *pl;
-	PCPOINT *pt;
-	char *str;
-	int i;
-	int npts = 4;
-
-	// build a dimensional patch
-	pl = pc_pointlist_make(npts);
-
-	for ( i = npts; i >= 0; i-- )
-	{
-		pt = pc_point_make(simpleschema);
-		pc_point_set_double_by_name(pt, "x", i*0.1);
-		pc_point_set_double_by_name(pt, "y", i*0.2);
-		pc_point_set_double_by_name(pt, "Z", i*0.3);
-		pc_point_set_double_by_name(pt, "intensity", 10);
-		pc_pointlist_add_point(pl, pt);
-	}
-
-	pau = pc_patch_uncompressed_from_pointlist(pl);
-
-	// assign a valid schema to the patch
-	pat = pc_patch_set_schema((PCPATCH*) pau, simpleschema_nointensity);
-	str = pc_patch_to_string(pat);
-
-	CU_ASSERT(pat != NULL);
-	CU_ASSERT_STRING_EQUAL(str, "{\"pcid\":0,\"pts\":[[0.4,0.8,1.2],[0.3,0.6,0.9],[0.2,0.4,0.6],[0.1,0.2,0.3],[0,0,0]]}");
-
-	pc_patch_free(pat);
-	pcfree(str);
-
-	pc_patch_free((PCPATCH*) pau);
-	pc_pointlist_free(pl);
-}
-
-#ifdef HAVE_LIBGHT
-static void
-test_patch_set_schema_compression_ght()
-{
-	// init data
-	PCPATCH_GHT *pag;
 	PCPATCH *pat0, *pat1;
 	PCPOINTLIST *pl;
 	PCPOINT *pt;
@@ -1089,45 +1047,82 @@ test_patch_set_schema_compression_ght()
 	int i;
 	int npts = 4;
 
-	// build a dimensional patch
+	// build a patch
 	pl = pc_pointlist_make(npts);
 
 	for ( i = npts; i >= 0; i-- )
 	{
 		pt = pc_point_make(simpleschema);
-		pc_point_set_double_by_name(pt, "X", i*0.1);
-		pc_point_set_double_by_name(pt, "Y", i*0.2);
-		pc_point_set_double_by_name(pt, "Z", i*0.3);
+		pc_point_set_double_by_name(pt, "X", i * 0.1);
+		pc_point_set_double_by_name(pt, "Y", i * 0.2);
+		pc_point_set_double_by_name(pt, "Z", i * 0.3);
 		pc_point_set_double_by_name(pt, "Intensity", 10);
 		pc_pointlist_add_point(pl, pt);
 	}
 
-	pag = pc_patch_ght_from_pointlist(pl);
+	pau = pc_patch_uncompressed_from_pointlist(pl);
 
 	// assign a valid schema to the patch
-	pat0 = pc_patch_set_schema((PCPATCH*) pag, simpleschema_nointensity);
-	str = pc_patch_to_string(pat0);
-
+	pat0 = pc_patch_set_schema((PCPATCH*) pau, simpleschema_nointensity, 0.0);
 	CU_ASSERT(pat0 != NULL);
+	str = pc_patch_to_string(pat0);
 	CU_ASSERT_STRING_EQUAL(str, "{\"pcid\":0,\"pts\":[[0.4,0.8,1.2],[0.3,0.6,0.9],[0.2,0.4,0.6],[0.1,0.2,0.3],[0,0,0]]}");
-
 	pcfree(str);
 
 	// assign a schema with unknown dimension to the patch
-	pat1 = pc_patch_set_schema(pat0, simpleschema);
-	str = pc_patch_to_string(pat1);
-
+	pat1 = pc_patch_set_schema(pat0, simpleschema, 0.0);
 	CU_ASSERT(pat1 != NULL);
+	str = pc_patch_to_string(pat1);
 	CU_ASSERT_STRING_EQUAL(str, "{\"pcid\":0,\"pts\":[[0.4,0.8,1.2,0],[0.3,0.6,0.9,0],[0.2,0.4,0.6,0],[0.1,0.2,0.3,0],[0,0,0,0]]}");
+	pcfree(str);
 
 	pc_patch_free(pat0);
 	pc_patch_free(pat1);
-	pcfree(str);
 
-	pc_patch_free((PCPATCH*) pag);
+	pc_patch_free((PCPATCH*) pau);
 	pc_pointlist_free(pl);
 }
-#endif
+
+static void
+test_patch_set_schema_compression_none_offset()
+{
+	// init data
+	PCPATCH_UNCOMPRESSED *pau;
+	PCPATCH *pat;
+	PCPOINTLIST *pl;
+	PCPOINT *pt;
+	PCSCHEMA *new_schema;
+	char *str;
+	int i;
+	int npts = 4;
+
+	// build a patch
+	pl = pc_pointlist_make(npts);
+	for ( i = npts; i >= 0; i-- )
+	{
+		pt = pc_point_make(simpleschema_nointensity);
+		pc_point_set_double_by_name(pt, "X", i * 0.1);
+		pc_point_set_double_by_name(pt, "Y", i * 0.2);
+		pc_point_set_double_by_name(pt, "Z", i * 0.3);
+		pc_pointlist_add_point(pl, pt);
+	}
+	pau = pc_patch_uncompressed_from_pointlist(pl);
+
+	new_schema = pc_schema_clone(simpleschema);
+	new_schema->dims[3]->offset = 10;
+
+	// assign a valid schema to the patch
+	pat = pc_patch_set_schema((PCPATCH *) pau, new_schema, 0.0);
+	CU_ASSERT(pat != NULL);
+	str = pc_patch_to_string(pat);
+	CU_ASSERT_STRING_EQUAL(str, "{\"pcid\":0,\"pts\":[[0.4,0.8,1.2,10],[0.3,0.6,0.9,10],[0.2,0.4,0.6,10],[0.1,0.2,0.3,10],[0,0,0,10]]}");
+	pcfree(str);
+
+	pc_patch_free(pat);
+	pc_schema_free(new_schema);
+	pc_patch_free((PCPATCH*) pau);
+	pc_pointlist_free(pl);
+}
 
 #ifdef HAVE_LAZPERF
 static void
@@ -1142,28 +1137,26 @@ test_patch_set_schema_compression_lazperf()
 	int i;
 	int npts = 4;
 
-	// build a dimensional patch
+	// build a patch
 	pl = pc_pointlist_make(npts);
 
 	for ( i = npts; i >= 0; i-- )
 	{
 		pt = pc_point_make(simpleschema);
-		pc_point_set_double_by_name(pt, "x", i*0.1);
-		pc_point_set_double_by_name(pt, "y", i*0.2);
-		pc_point_set_double_by_name(pt, "Z", i*0.3);
-		pc_point_set_double_by_name(pt, "intensity", 10);
+		pc_point_set_double_by_name(pt, "X", i * 0.1);
+		pc_point_set_double_by_name(pt, "Y", i * 0.2);
+		pc_point_set_double_by_name(pt, "Z", i * 0.3);
+		pc_point_set_double_by_name(pt, "Intensity", 10);
 		pc_pointlist_add_point(pl, pt);
 	}
 
 	pal = pc_patch_lazperf_from_pointlist(pl);
 
 	// assign a valid schema to the patch
-	pat = pc_patch_set_schema((PCPATCH*) pal, simpleschema_nointensity);
-	str = pc_patch_to_string(pat);
-
+	pat = pc_patch_set_schema((PCPATCH*) pal, simpleschema_nointensity, 0.0);
 	CU_ASSERT(pat != NULL);
+	str = pc_patch_to_string(pat);
 	CU_ASSERT_STRING_EQUAL(str, "{\"pcid\":0,\"pts\":[[0.4,0.8,1.2],[0.3,0.6,0.9],[0.2,0.4,0.6],[0.1,0.2,0.3],[0,0,0]]}");
-
 	pc_patch_free(pat);
 	pcfree(str);
 
@@ -1171,6 +1164,56 @@ test_patch_set_schema_compression_lazperf()
 	pc_pointlist_free(pl);
 }
 #endif	/* HAVE_LAZPERF */
+
+#ifdef HAVE_LIBGHT
+static void
+test_patch_set_schema_compression_ght()
+{
+	// init data
+	PCPATCH_GHT *pag;
+	PCPATCH *pat0, *pat1;
+	PCPOINTLIST *pl;
+	PCPOINT *pt;
+	char *str;
+	int i;
+	int npts = 4;
+
+	// build a patch
+	pl = pc_pointlist_make(npts);
+
+	for ( i = npts; i >= 0; i-- )
+	{
+		pt = pc_point_make(simpleschema);
+		pc_point_set_double_by_name(pt, "X", i * 0.1);
+		pc_point_set_double_by_name(pt, "Y", i * 0.2);
+		pc_point_set_double_by_name(pt, "Z", i * 0.3);
+		pc_point_set_double_by_name(pt, "Intensity", 10);
+		pc_pointlist_add_point(pl, pt);
+	}
+
+	pag = pc_patch_ght_from_pointlist(pl);
+
+	// assign a valid schema to the patch
+	pat0 = pc_patch_set_schema((PCPATCH*) pag, simpleschema_nointensity, 0.0);
+	CU_ASSERT(pat0 != NULL);
+	str = pc_patch_to_string(pat0);
+	CU_ASSERT_STRING_EQUAL(str, "{\"pcid\":0,\"pts\":[[0.4,0.8,1.2],[0.3,0.6,0.9],[0.2,0.4,0.6],[0.1,0.2,0.3],[0,0,0]]}");
+	pcfree(str);
+
+	// assign a schema with unknown dimension to the patch
+	pat1 = pc_patch_set_schema(pat0, simpleschema, 0.0);
+	CU_ASSERT(pat1 != NULL);
+	str = pc_patch_to_string(pat1);
+	CU_ASSERT_STRING_EQUAL(str, "{\"pcid\":0,\"pts\":[[0.4,0.8,1.2,0],[0.3,0.6,0.9,0],[0.2,0.4,0.6,0],[0.1,0.2,0.3,0],[0,0,0,0]]}");
+	pcfree(str);
+
+	pc_patch_free(pat0);
+	pc_patch_free(pat1);
+
+	pc_patch_free((PCPATCH*) pag);
+	pc_pointlist_free(pl);
+}
+#endif
 
 static void
 test_patch_set_schema_dimensional_compression(enum DIMCOMPRESSIONS dimcomp)
@@ -1184,16 +1227,16 @@ test_patch_set_schema_dimensional_compression(enum DIMCOMPRESSIONS dimcomp)
 	int i;
 	int npts = PCDIMSTATS_MIN_SAMPLE+1; // force to keep custom compression
 
-	// build a dimensional patch
+	// build a patch
 	pl = pc_pointlist_make(npts);
 
 	for ( i = npts; i >= 0; i-- )
 	{
-	pt = pc_point_make(simpleschema);
-		pc_point_set_double_by_name(pt, "x", i*0.1);
-		pc_point_set_double_by_name(pt, "y", i*0.2);
-		pc_point_set_double_by_name(pt, "Z", i*0.3);
-		pc_point_set_double_by_name(pt, "intensity", 10);
+		pt = pc_point_make(simpleschema);
+		pc_point_set_double_by_name(pt, "X", i * 0.1);
+		pc_point_set_double_by_name(pt, "Y", i * 0.2);
+		pc_point_set_double_by_name(pt, "Z", i * 0.3);
+		pc_point_set_double_by_name(pt, "Intensity", 10);
 		pc_pointlist_add_point(pl, pt);
 	}
 
@@ -1209,18 +1252,15 @@ test_patch_set_schema_dimensional_compression(enum DIMCOMPRESSIONS dimcomp)
 	padim2 = pc_patch_dimensional_compress(padim1, stats);
 
 	// assign a valid schema to the patch
-	pat = pc_patch_set_schema((PCPATCH*) padim2, simpleschema_nointensity);
-
+	pat = pc_patch_set_schema((PCPATCH*) padim2, simpleschema_nointensity, 0.0);
+	CU_ASSERT(pat != NULL);
 	pt = pc_patch_pointn(pat, 1);
 	str = pc_point_to_string(pt);
-
-	CU_ASSERT(pat != NULL);
 	CU_ASSERT_STRING_EQUAL(str,"{\"pcid\":0,\"pt\":[1000.1,2000.2,3000.3]}");
-
-	pc_patch_free(pat);
 	pcfree(str);
-
 	pc_point_free(pt);
+	pc_patch_free(pat);
+
 	pc_pointlist_free(pl);
 	pc_dimstats_free(stats);
 	pc_patch_free((PCPATCH *)padim1);
@@ -1250,6 +1290,101 @@ test_patch_set_schema_dimensional_compression_rle()
 {
 	test_patch_set_schema_dimensional_compression(PC_DIM_RLE);
 }
+
+static void
+test_patch_transform_compression_none()
+{
+	// init data
+	PCPATCH_UNCOMPRESSED *pau;
+	PCSCHEMA *nschema;
+	PCPOINTLIST *pl;
+	PCPATCH *pa;
+	PCPOINT *pt;
+	char *str;
+	int i;
+	int npts = 5;
+	uint8_t *wkb;
+	size_t wkbsize;
+
+	// build a patch
+	pl = pc_pointlist_make(npts);
+	for ( i = (npts - 1); i >= 0; i-- )
+	{
+		pt = pc_point_make(simpleschema);
+		pc_point_set_double_by_name(pt, "X", i * 0.1);
+		pc_point_set_double_by_name(pt, "Y", i * 0.2);
+		pc_point_set_double_by_name(pt, "Z", i * 0.3);
+		pc_point_set_double_by_name(pt, "Intensity", 10);
+		pc_pointlist_add_point(pl, pt);
+	}
+	pau = pc_patch_uncompressed_from_pointlist(pl);
+
+	// create a new schema, and use 0.02 scale values for x, y and z
+	nschema = pc_schema_clone(simpleschema);
+	nschema->xdim->scale = 0.02;
+	nschema->ydim->scale = 0.02;
+	nschema->zdim->scale = 0.02;
+
+	// transform the patch
+	pa = pc_patch_transform((PCPATCH*) pau, nschema, 0.0);
+	CU_ASSERT(pa != NULL);
+
+	// check point 1
+	// expected: x=hex(20)=0x14, y=hex(40)=0x28, z=hex(60)=0x3C, I=hex(10)=0x0A
+	pt = pc_patch_pointn(pa, 1);
+	wkb = pc_point_to_wkb(pt, &wkbsize);
+	str = pc_hexbytes_from_bytes(wkb, wkbsize);
+	CU_ASSERT_STRING_EQUAL(str, "010000000014000000280000003C0000000A00");
+	pcfree(str);
+	pcfree(wkb);
+	pc_point_free(pt);
+
+	// check point 2
+	// expected: x=hex(15)=0x0F, y=hex(30)=0x1E, z=hex(45)=0x2D, I=hex(10)=0x0A
+	pt = pc_patch_pointn(pa, 2);
+	wkb = pc_point_to_wkb(pt, &wkbsize);
+	str = pc_hexbytes_from_bytes(wkb, wkbsize);
+	CU_ASSERT_STRING_EQUAL(str, "01000000000F0000001E0000002D0000000A00");
+	pcfree(str);
+	pcfree(wkb);
+	pc_point_free(pt);
+
+	// check point 3
+	// expected: x=hex(10)=0x0A, y=hex(20)=0x14, z=hex(30)=0x1E, I=hex(10)=0x0A
+	pt = pc_patch_pointn(pa, 3);
+	wkb = pc_point_to_wkb(pt, &wkbsize);
+	str = pc_hexbytes_from_bytes(wkb, wkbsize);
+	CU_ASSERT_STRING_EQUAL(str, "01000000000A000000140000001E0000000A00");
+	pcfree(str);
+	pcfree(wkb);
+	pc_point_free(pt);
+
+	// check point 4
+	// expected: x=hex(5)=0x05, y=hex(10)=0x0A, z=hex(15)=0x0F, I=hex(10)=0x0A
+	pt = pc_patch_pointn(pa, 4);
+	wkb = pc_point_to_wkb(pt, &wkbsize);
+	str = pc_hexbytes_from_bytes(wkb, wkbsize);
+	CU_ASSERT_STRING_EQUAL(str, "0100000000050000000A0000000F0000000A00");
+	pcfree(str);
+	pcfree(wkb);
+	pc_point_free(pt);
+
+	// check point 5
+	// expected: x=hex(0)=0x00, y=hex(0)=0x00, z=hex(0)=0x00, I=hex(10)=0x0A
+	pt = pc_patch_pointn(pa, 5);
+	wkb = pc_point_to_wkb(pt, &wkbsize);
+	str = pc_hexbytes_from_bytes(wkb, wkbsize);
+	CU_ASSERT_STRING_EQUAL(str, "01000000000000000000000000000000000A00");
+	pcfree(str);
+	pcfree(wkb);
+	pc_point_free(pt);
+
+	pc_patch_free(pa);
+	pc_schema_free(nschema);
+	pc_patch_free((PCPATCH*) pau);
+	pc_pointlist_free(pl);
+}
+
 
 /* REGISTER ***********************************************************/
 
@@ -1290,6 +1425,7 @@ CU_TestInfo patch_tests[] = {
 	PC_TEST(test_patch_range_compression_lazperf),
 #endif
 	PC_TEST(test_patch_set_schema_compression_none),
+	PC_TEST(test_patch_set_schema_compression_none_offset),
 #ifdef HAVE_LIBGHT
 	PC_TEST(test_patch_set_schema_compression_ght),
 #endif
@@ -1300,6 +1436,7 @@ CU_TestInfo patch_tests[] = {
 #ifdef HAVE_LAZPERF
 	PC_TEST(test_patch_set_schema_compression_lazperf),
 #endif
+	PC_TEST(test_patch_transform_compression_none),
 	CU_TEST_INFO_NULL
 };
 

@@ -253,11 +253,11 @@ void pc_install_default_handlers(void);
 */
 
 /** Convert binary to hex */
-uint8_t* bytes_from_hexbytes(const char *hexbuf, size_t hexsize);
+uint8_t* pc_bytes_from_hexbytes(const char *hexbuf, size_t hexsize);
 /** Convert hex to binary */
-char* hexbytes_from_bytes(const uint8_t *bytebuf, size_t bytesize);
+char* pc_hexbytes_from_bytes(const uint8_t *bytebuf, size_t bytesize);
 /** Read the the PCID from WKB form of a POINT/PATCH */
-uint32_t wkb_get_pcid(const uint8_t *wkb);
+uint32_t pc_wkb_get_pcid(const uint8_t *wkb);
 /** Build an empty #PCDIMSTATS based on the schema */
 PCDIMSTATS* pc_dimstats_make(const PCSCHEMA *schema);
 /** Get compression name from enum */
@@ -289,6 +289,10 @@ void pc_schema_set_dimension(PCSCHEMA *s, PCDIMENSION *d);
 void pc_schema_check_xyzm(PCSCHEMA *s);
 /** Get the width in bytes of a single point in the schema */
 size_t pc_schema_get_size(const PCSCHEMA *s);
+/** Check whether the schemas have the same dimensions at the same positions */
+uint32_t pc_schema_same_dimensions(const PCSCHEMA *s1, const PCSCHEMA *s2);
+/** Check whether the schemas have compatible dimension interpretations */
+uint32_t pc_schema_same_interpretations(const PCSCHEMA *s1, const PCSCHEMA *s2);
 
 
 /**********************************************************************
@@ -479,6 +483,12 @@ uint32_t pc_patch_is_sorted(const PCPATCH *pa, const char **name, int ndims, cha
 /** Subset batch based on index */
 PCPATCH* pc_patch_range(const PCPATCH *pa, int first, int count);
 
+/** assign a schema to the patch */
+PCPATCH *pc_patch_set_schema(PCPATCH *patch, const PCSCHEMA *schema, double def);
+
+/** transform the patch based on the passed schema */
+PCPATCH *pc_patch_transform(const PCPATCH *patch, const PCSCHEMA *schema, double def);
+
 /** Interpolated point on dimension given a patch. Issues warning when encountering duplicate values on dimension */
 PCPOINT *pc_point_interp(const PCPATCH *pa, const char *name, double value, char sorted);
 
@@ -487,11 +497,5 @@ PCPATCH *pc_patch_interp(
 	const PCPATCH *p1, const PCPATCH *p2,
 	const char *name1, const char *name2,
 	char sorted1, char sorted2);
-
-/** Subset batch based on index */
-PCPATCH* pc_patch_range(const PCPATCH *pa, int first, int cound);
-
-/** assign a schema to the patch */
-PCPATCH *pc_patch_set_schema(const PCPATCH *patch, const PCSCHEMA *schema);
 
 #endif /* _PC_API_H */
