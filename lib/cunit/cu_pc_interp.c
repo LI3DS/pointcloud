@@ -51,7 +51,7 @@ test_interp_simple()
 
 	char *hexbuf = "0000000000000000000000000200000008000000030000000600060000000200000001000000040008";
 	size_t hexsize = strlen(hexbuf);
-	uint8_t *wkb = bytes_from_hexbytes(hexbuf, hexsize);
+	uint8_t *wkb = pc_bytes_from_hexbytes(hexbuf, hexsize);
 	PCPATCH *pa = pc_patch_from_wkb(schema, wkb, hexsize/2);
 	PCPOINTLIST *li = pc_pointlist_from_patch(pa);
 
@@ -80,7 +80,7 @@ test_interp_sorted()
 	char *pstr;
 	char *hexbuf = "0000000000000000000000000200000002000000010000000400080000000800000003000000060006";
 	size_t hexsize = strlen(hexbuf);
-	uint8_t *wkb = bytes_from_hexbytes(hexbuf, hexsize);
+	uint8_t *wkb = pc_bytes_from_hexbytes(hexbuf, hexsize);
 	PCPATCH *pa = pc_patch_from_wkb(schema, wkb, hexsize/2);
 	PCPOINTLIST *li = pc_pointlist_from_patch(pa);
 
@@ -114,7 +114,7 @@ test_interp_limits()
 
 	char *hexbuf = "0000000000000000000000000200000008000000030000000600060000000200000001000000040008";
 	size_t hexsize = strlen(hexbuf);
-	uint8_t *wkb = bytes_from_hexbytes(hexbuf, hexsize);
+	uint8_t *wkb = pc_bytes_from_hexbytes(hexbuf, hexsize);
 	PCPATCH *pa = pc_patch_from_wkb(schema, wkb, hexsize/2);
 	PCPOINTLIST *li = pc_pointlist_from_patch(pa);
 	char *pstr;

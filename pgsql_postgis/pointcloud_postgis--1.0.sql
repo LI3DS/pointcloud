@@ -16,14 +16,22 @@ CREATE OR REPLACE FUNCTION PC_Intersection(pcpatch, geometry)
 -----------------------------------------------------------------------------
 -- Cast from pcpatch to polygon
 --
-CREATE OR REPLACE FUNCTION PC_Envelope(pcpatch)
+CREATE OR REPLACE FUNCTION PC_EnvelopeGeometry(pcpatch)
 	RETURNS geometry AS
 	$$
 		SELECT ST_GeomFromEWKB(PC_EnvelopeAsBinary($1))
 	$$
 	LANGUAGE 'sql';
 
-CREATE CAST (pcpatch AS geometry) WITH FUNCTION PC_Envelope(pcpatch);
+CREATE OR REPLACE FUNCTION geometry(pcpatch)
+	RETURNS geometry AS
+	$$
+		SELECT PC_EnvelopeGeometry($1)
+	$$
+	LANGUAGE 'sql';
+
+CREATE CAST (pcpatch AS geometry) WITH FUNCTION PC_EnvelopeGeometry(pcpatch);
+
 
 -----------------------------------------------------------------------------
 -- Cast from pcpoint to point
@@ -55,7 +63,7 @@ CREATE OR REPLACE FUNCTION PC_FrustumAsGeom(pcpatch)
 CREATE OR REPLACE FUNCTION PC_Intersects(pcpatch, geometry)
 	RETURNS boolean AS
 	$$
-		SELECT ST_Intersects($2, PC_Envelope($1))
+		SELECT ST_Intersects($2, PC_EnvelopeGeometry($1))
 	$$
 	LANGUAGE 'sql';
 
@@ -69,7 +77,7 @@ CREATE OR REPLACE FUNCTION PC_Intersects(geometry, pcpatch)
 -----------------------------------------------------------------------------
 -- Function from pcpatch to LineString
 --
-CREATE OR REPLACE FUNCTION PC_BoundingDiagonal(pcpatch)
+CREATE OR REPLACE FUNCTION PC_BoundingDiagonalGeometry(pcpatch)
 	RETURNS geometry AS
 	$$
 		SELECT ST_GeomFromEWKB(PC_BoundingDiagonalAsBinary($1))

@@ -54,7 +54,7 @@ test_frustum_wkb_expected(LIFRUSTUM *frustum, const char *expected)
 	char *hexbytes;
 	uint32_t srid = 0;
 	wkb = li_frustum_to_geometry_wkb(frustum,srid,&wkbsize);
-	hexbytes = hexbytes_from_bytes(wkb,wkbsize);
+	hexbytes = pc_hexbytes_from_bytes(wkb,wkbsize);
 
 	if(expected)
 		CU_ASSERT_STRING_EQUAL(hexbytes,expected);

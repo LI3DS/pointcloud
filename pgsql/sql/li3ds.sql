@@ -62,7 +62,7 @@ FROM (
  FROM generate_series(1,1600) AS a
 ) AS values GROUP BY gid;
 
-SELECT ST_AsText(PC_Envelope(pa)), ST_AsText(PC_FrustumAsGeom(pa)) FROM pa_test_frustum_li3ds;
+SELECT ST_AsText(PC_EnvelopeGeometry(pa)), ST_AsText(PC_FrustumAsGeom(pa)) FROM pa_test_frustum_li3ds;
 
 DROP TABLE pa_test_frustum_li3ds;
 TRUNCATE pointcloud_formats;
