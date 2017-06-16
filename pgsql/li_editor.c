@@ -31,15 +31,15 @@ static float8* li_getarg_float8_array(FunctionCallInfoData *fcinfo, int pos, int
 		return NULL;
 	}
 	if ( ARR_NDIM(array) != 1 ) {
-		elog(ERROR, "array array must have only one dimension");
+		elog(ERROR, "array must have only one dimension");
 		return NULL;
 	}
 	if ( ARR_HASNULL(array) ) {
-		elog(ERROR, "array array must not have null elements");
+		elog(ERROR, "array must not have null elements");
 		return NULL;
 	}
 	if ( ARR_DIMS(array)[0] != num_elts ) {
-		elog(ERROR, "array array must have %d elements", num_elts);
+		elog(ERROR, "array must have %d elements", num_elts);
 		return NULL;
 	}
 
