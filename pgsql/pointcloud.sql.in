@@ -513,3 +513,22 @@ CREATE OR REPLACE FUNCTION PC_Projective(pa pcpoint, a float8, b float8, c float
 CREATE OR REPLACE FUNCTION PC_FrustumAsEWKB(p pcpatch)
 	RETURNS bytea AS 'MODULE_PATHNAME', 'lifrustum_from_patch_as_bytea'
 	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION libox4d_in(cstring)
+	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_in'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION libox4d_out(libox4d)
+	RETURNS cstring AS 'MODULE_PATHNAME', 'libox4d_out'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE TYPE libox4d (
+	alignment = double,
+	internallength = 64,
+	input = libox4d_in,
+	output = libox4d_out
+);
+
+CREATE OR REPLACE FUNCTION PC_Affine(box libox4d, mat33 float8[9], vec3 float8[3])
+	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_affine'
+	LANGUAGE 'c' IMMUTABLE STRICT;

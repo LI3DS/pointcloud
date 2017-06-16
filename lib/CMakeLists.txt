@@ -25,6 +25,7 @@ set ( LI_SOURCES
         li_matrix.c
         li_patch.c
         li_point.c
+        li_box4d.c
         )
 
 set ( LAZPERF_SOURCES

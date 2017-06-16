@@ -29,7 +29,8 @@ OBJS = \
 OBJS += \
 	li_matrix.o \
 	li_patch.o \
-	li_point.o
+	li_point.o \
+	li_box4d.o
 
 
 OBJS_LAZPERF = \
