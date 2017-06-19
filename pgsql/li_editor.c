@@ -492,31 +492,28 @@ Datum lipoint_projective(PG_FUNCTION_ARGS)
 
 /**
 * Apply an affine transformation to a box4d
-* PC_Affine(box libox4d, mat33 float8[9], off float8[3]) returns libox4d
+* PC_Affine(box libox4d, mat43 float8[9]) returns libox4d
 */
 PG_FUNCTION_INFO_V1(libox4d_affine);
 Datum libox4d_affine(PG_FUNCTION_ARGS)
 {
 	LIBOX4 *ibox, *obox;
-	float8 *mat33, *vec3;
+	float8 *mat43;
 
 	if ( PG_ARGISNULL(0) )
 		PG_RETURN_NULL();	/* returns null if no input values */
 
 	ibox = (LIBOX4 *) PG_GETARG_POINTER(0);
 
-	mat33 = li_getarg_float8_array(fcinfo, 1, 9);
-	if ( ! mat33 )
-		PG_RETURN_NULL();
-	vec3 = li_getarg_float8_array(fcinfo, 2, 3);
-	if ( ! vec3 )
+	mat43 = li_getarg_float8_array(fcinfo, 1, 12);
+	if ( ! mat43 )
 		PG_RETURN_NULL();
 
 	obox = li_box4d_affine(*ibox,
-		mat33[0], mat33[1], mat33[2],
-		mat33[3], mat33[4], mat33[5],
-		mat33[6], mat33[7], mat33[8],
-		vec3[0], vec3[1], vec3[2]);
+		mat43[0], mat43[1], mat43[2],
+		mat43[4], mat43[5], mat43[6],
+		mat43[8], mat43[9], mat43[10],
+		mat43[3], mat43[7], mat43[11]);
 
 	PG_RETURN_POINTER(obox);
 }
