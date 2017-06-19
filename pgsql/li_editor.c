@@ -492,7 +492,7 @@ Datum lipoint_projective(PG_FUNCTION_ARGS)
 
 /**
 * Apply an affine transformation to a box4d
-* PC_Affine(box libox4d, mat43 float8[9]) returns libox4d
+* PC_Affine(box libox4d, mat43 float8[12]) returns libox4d
 */
 PG_FUNCTION_INFO_V1(libox4d_affine);
 Datum libox4d_affine(PG_FUNCTION_ARGS)
