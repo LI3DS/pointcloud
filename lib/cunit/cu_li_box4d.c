@@ -26,6 +26,44 @@ clean_suite(void)
 /* TESTS **************************************************************/
 
 static void
+test_rotate_quaternion()
+{
+	double qw, qx, qy, qz;
+	double angle;
+	LIBOX4 ibox, *obox;
+
+	// π/4 rotation around x axis
+	angle = M_PI_4;
+	qw = cos(angle / 2.);
+	qx = sin(angle / 2.);
+	qy = 0;
+	qz = 0;
+
+	// 3d box centered on (0, 0, 0)
+	ibox[0][0] = -1.0;
+	ibox[0][1] = -1.0;
+	ibox[0][2] = 1.0;
+	ibox[0][3] = 10.0;
+	ibox[1][0] = 1.0;
+	ibox[1][1] = 1.0;
+	ibox[1][2] = -1.0;
+	ibox[1][3] = 20.0;
+
+	obox = li_box4d_rotate_quaternion(ibox, qw, qx, qy, qz);
+
+	CU_ASSERT((*obox)[0][0] == -1.0);
+	CU_ASSERT_DOUBLE_EQUAL((*obox)[0][1], -sqrt(2.0), 0.000001);
+	CU_ASSERT_DOUBLE_EQUAL((*obox)[0][2], -sqrt(2.0), 0.000001);
+	CU_ASSERT((*obox)[0][3] == 10.0);
+	CU_ASSERT((*obox)[1][0] == 1.0);
+	CU_ASSERT_DOUBLE_EQUAL((*obox)[1][1], sqrt(2.0), 0.000001);
+	CU_ASSERT_DOUBLE_EQUAL((*obox)[1][2], sqrt(2.0), 0.000001);
+	CU_ASSERT((*obox)[1][3] == 20.0);
+
+	pcfree(obox);
+}
+
+static void
 test_affine()
 {
 	double a, b, c, d, e, f, g, h, i;
@@ -78,6 +116,7 @@ test_affine()
 /* REGISTER ***********************************************************/
 
 CU_TestInfo li_box4d_tests[] = {
+	PC_TEST(test_rotate_quaternion),
 	PC_TEST(test_affine),
 	CU_TEST_INFO_NULL
 };
