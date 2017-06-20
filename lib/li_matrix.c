@@ -148,6 +148,38 @@ li_matrix_33_set_from_quaternion(LIMAT33 mat,
 }
 
 /**
+* Sets the 4x4 matrix mat associated to the pinhole projection with
+* principal point px, py
+* focal fx, fy (defaults to fx)
+* shearing s (defaults to 0)
+*/
+void
+li_matrix_44_set_from_pinhole_projection(LIMAT44 mat,
+		double px, double py, double fx, double fy, double s)
+{
+	mat[ 0] = fx; mat[ 1] = +s; mat[ 2] = px; mat[ 3] = 0;
+	mat[ 4] = 0;  mat[ 5] = fy; mat[ 6] = py; mat[ 7] = 0;
+	mat[ 8] = 0;  mat[ 9] = 0;  mat[10] = 0;  mat[11] = 1;
+	mat[12] = 0;  mat[13] = 0;  mat[14] = 1;  mat[15] = 0;
+}
+
+/**
+* Sets the 4x4 matrix mat associated to the pinhole unprojection with 
+* principal point px, py
+* focal fx, fy (defaults to fx)
+* shearing s (defaults to 0)
+*/
+void
+li_matrix_44_set_from_pinhole_unprojection(LIMAT44 mat,
+		double px, double py, double fx, double fy, double s)
+{
+	mat[ 0] = fy; mat[ 1] = -s; mat[ 2] = 0;       mat[ 3] = py*s-fy*px;
+	mat[ 4] = 0;  mat[ 5] = fx; mat[ 6] = 0;       mat[ 7] =     -fx*py;
+	mat[ 8] = 0;  mat[ 9] = 0;  mat[10] = 0;       mat[11] =      fx*fy;
+	mat[12] = 0;  mat[13] = 0;  mat[14] = mat[11]; mat[15] = 0;
+}
+
+/**
 * Multiply mat by vec and store the resuting vector in res.
 */
 void
