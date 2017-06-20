@@ -575,8 +575,11 @@ li_vector_3_cartesian_from_spherical(LIVEC3 res, const LIVEC3 vec)
 int
 li_box_cartesian_from_spherical(LIBOX3 res, const LIBOX3 b)
 {
-	pcwarn("%s: not implemented yet...", __func__);
-	return PC_FAILURE;
+	// disregard angles for now (conservative bounding box)
+	double r = fmax(fabs(b[0][0]), fabs(b[1][0]));
+	res[0][0] = res[0][1] = res[0][2] = - r;
+	res[1][0] = res[1][1] = res[1][2] = - r;
+	return PC_SUCCESS;
 }
 
 int
@@ -602,8 +605,19 @@ li_vector_3_spherical_from_cartesian(LIVEC3 res, const LIVEC3 vec)
 int
 li_box_spherical_from_cartesian(LIBOX3 res, const LIBOX3 b)
 {
-	pcwarn("%s: not implemented yet...", __func__);
-	return PC_FAILURE;
+	// disregard angles for now (conservative bounding box)
+	LIVEC3 p[] = { LIBOX3CORNERS(b) };
+	int i;
+	double r2min = 0, r2max = 0, r2;
+	for( i = 0; i < 8; ++i )
+	{
+		r2 = li_vector_3_dot(p[i],p[i]);
+		if( r2 < r2min || i == 0 ) r2min = r2;
+		if( r2 > r2max ) r2max = r2;
+	}
+	res[0][0] = sqrt(r2min); res[0][1] = -M_PI; res[0][2] = -M_PI_2;
+	res[1][0] = sqrt(r2max); res[0][1] = +M_PI; res[0][2] = +M_PI_2;
+	return PC_SUCCESS;
 }
 
 int
