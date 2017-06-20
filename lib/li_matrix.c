@@ -164,7 +164,7 @@ li_matrix_44_set_from_pinhole_projection(LIMAT44 mat,
 }
 
 /**
-* Sets the 4x4 matrix mat associated to the pinhole unprojection with 
+* Sets the 4x4 matrix mat associated to the pinhole unprojection with
 * principal point px, py
 * focal fx, fy (defaults to fx)
 * shearing s (defaults to 0)
