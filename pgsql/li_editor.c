@@ -494,8 +494,8 @@ Datum lipoint_projective(PG_FUNCTION_ARGS)
 * Apply an affine transformation to a box4d
 * PC_Affine(box libox4d, mat43 float8[9]) returns libox4d
 */
-PG_FUNCTION_INFO_V1(libox4d_affine);
-Datum libox4d_affine(PG_FUNCTION_ARGS)
+PG_FUNCTION_INFO_V1(libox4d_affine_matr);
+Datum libox4d_affine_matr(PG_FUNCTION_ARGS)
 {
 	LIBOX4 *ibox, *obox;
 	float8 *mat43;
@@ -514,6 +514,44 @@ Datum libox4d_affine(PG_FUNCTION_ARGS)
 		mat43[4], mat43[5], mat43[6],
 		mat43[8], mat43[9], mat43[10],
 		mat43[3], mat43[7], mat43[11]);
+
+	PG_RETURN_POINTER(obox);
+}
+
+/**
+* Rotate and translate a box4d given a unit quaternion and a vector.
+* PC_Affine(box libox4d, quat float8[4], vec float8[3]) returns libox4d
+*/
+PG_FUNCTION_INFO_V1(libox4d_affine_quat);
+Datum libox4d_affine_quat(PG_FUNCTION_ARGS)
+{
+	int d;
+	LIBOX4 *ibox, *obox;
+	float8 *quat, *vec;
+
+	if ( PG_ARGISNULL(0) )
+		PG_RETURN_NULL();	/* returns null if no input values */
+
+	ibox = (LIBOX4 *) PG_GETARG_POINTER(0);
+
+	quat = li_getarg_float8_array(fcinfo, 1, 4);
+	if ( ! quat )
+		PG_RETURN_NULL();
+
+	vec = li_getarg_float8_array(fcinfo, 2, 3);
+	if ( ! vec )
+		PG_RETURN_NULL();
+
+	// rotate
+	obox = li_box4d_rotate_quaternion(*ibox,
+		quat[0], quat[1], quat[2], quat[3]);
+
+	// translate
+	for ( d = 0; d < 3; d++)
+	{
+		(*obox)[0][d] += vec[d];
+		(*obox)[1][d] += vec[d];
+	}
 
 	PG_RETURN_POINTER(obox);
 }
