@@ -6,6 +6,8 @@
 #include "pc_api_internal.h"
 #include "li_api_internal.h"
 
+#include <math.h>
+
 
 typedef void (*transform_fn_t)(LIVEC3, const double *, const LIVEC3);
 
@@ -35,15 +37,16 @@ li_box4d_transform(LIBOX4 ibox, void *mat, transform_fn_t transform)
 
 		transform(rvec, mat, vec);
 
-		for ( d = 0; d < 3; d++ )
-		{
-			if ( idx == 0 )
+		if (idx == 0 )
+			for ( d = 0; d < 3; d++ )
 				(*obox)[0][d] = (*obox)[1][d] = rvec[d];
-			else if ( rvec[d] < (*obox)[0][d] )
-				(*obox)[0][d] = rvec[d];
-			else if ( rvec[d] > (*obox)[1][d] )
-				(*obox)[1][d] = rvec[d];
-		}
+		else
+			for ( d = 0; d < 3; d++ )
+			{
+				(*obox)[0][d] = fmin((*obox)[0][d], rvec[d]);
+				(*obox)[1][d] = fmax((*obox)[1][d], rvec[d]);
+			}
+
 	}
 
 	return obox;
