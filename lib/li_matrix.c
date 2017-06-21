@@ -660,11 +660,20 @@ li_frustum_spherical_from_cartesian(LIFRUSTUM *res, const LIFRUSTUM *f)
 }
 
 
+void
+li_distortion_set(LIDISTORSION* dist, double pps0, double pps1, double c0, double c1, double c2)
+{
+	dist->pps[0] = pps0;
+	dist->pps[1] = pps1;
+	dist->c[0] = c0;
+	dist->c[1] = c1;
+	dist->c[2] = c2;
+}
+
 /**
 * Distorsion polynom : r3,r5,r7
 * https://github.com/IGNF/libOri/blob/master/src/DistortionPolynom.cpp
 */
-
 int
 li_vector_3_distorsion(LIVEC3 res, const LIDISTORSION *d, const LIVEC3 vec)
 {

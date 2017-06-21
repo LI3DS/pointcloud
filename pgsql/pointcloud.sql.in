@@ -536,3 +536,11 @@ CREATE OR REPLACE FUNCTION PC_Affine(box libox4d, mat43 float8[12])
 CREATE OR REPLACE FUNCTION PC_Affine(box libox4d, quat float8[4], vec float8[3])
 	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_affine_quat'
 	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_UndistortPolyRadial5(box libox4d, pps float8[2], c float8[2], type integer default 5)
+	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_undistort_poly_radial'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_UndistortPolyRadial7(box libox4d, pps float8[2], c float8[3], type integer default 7)
+	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_undistort_poly_radial'
+	LANGUAGE 'c' IMMUTABLE STRICT;
