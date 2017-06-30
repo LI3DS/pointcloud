@@ -121,3 +121,40 @@ li_box4d_undistort(
 
 	return obox;
 }
+
+
+/**
+* Distort a box4d.
+*/
+LIBOX4 *
+li_box4d_distort(
+	LIBOX4 ibox,
+	double pps0, double pps1, double c0, double c1, double c2)
+{
+	int d;
+	LIBOX3 res;
+	LIDISTORSION dist;
+	LIBOX4 *obox;
+	const LIBOX3 box = {
+		{ibox[0][0], ibox[0][1], ibox[0][2]},
+		{ibox[1][0], ibox[1][1], ibox[1][2]}};
+
+	li_distortion_set(&dist, pps0, pps1, c0, c1, c2);
+
+	if ( li_box_transform_distorsion(res, &dist, box) == PC_FAILURE )
+		return NULL;
+
+	obox = pcalloc(sizeof(LIBOX4));
+
+	// m values are unchanged
+	(*obox)[0][3] = ibox[0][3];
+	(*obox)[1][3] = ibox[1][3];
+
+	for ( d = 0; d < 3; d++)
+	{
+		(*obox)[0][d] = res[0][d];
+		(*obox)[1][d] = res[1][d];
+	}
+
+	return obox;
+}
