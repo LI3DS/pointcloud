@@ -163,9 +163,8 @@ pc_patch_ght_from_uncompressed(const PCPATCH_UNCOMPRESSED *pa)
 				double val;
 
 				dim = pc_schema_get_dimension(pa->schema, j);
-
 				/* Don't add X or Y as attributes, they are already embodied in the hash */
-				if ( dim == pa->schema->xdim || dim == pa->schema->ydim )
+				if ( dim == xdim || dim == ydim )
 					continue;
 
 				pc_point_get_double(&pt, dim, &val);
