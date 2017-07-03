@@ -581,18 +581,6 @@ pc_schema_is_valid(const PCSCHEMA *s)
 {
 	int i;
 
-	if ( ! s->xdim )
-	{
-		pcwarn("schema does not include an X coordinate");
-		return PC_FALSE;
-	}
-
-	if ( ! s->ydim )
-	{
-		pcwarn("schema does not include a Y coordinate");
-		return PC_FALSE;
-	}
-
 	if ( ! s->ndims )
 	{
 		pcwarn("schema has no dimensions");
