@@ -10,7 +10,9 @@
 /* GLOBALS ************************************************************/
 
 static PCSCHEMA *simpleschema = NULL;
+static PCSCHEMA *simpleschema_xyz_double = NULL;
 static const char *simplexmlfile = "data/simple-schema.xml";
+static const char *simplexmlfile_xyz_double = "data/simple-schema-xyz-double.xml";
 
 /* Setup/teardown for this suite */
 static int
@@ -20,6 +22,11 @@ init_suite(void)
 	simpleschema = pc_schema_from_xml(xmlstr);
 	pcfree(xmlstr);
 	if ( !simpleschema ) return 1;
+
+	xmlstr = file_to_str(simplexmlfile_xyz_double);
+	simpleschema_xyz_double = pc_schema_from_xml(xmlstr);
+	pcfree(xmlstr);
+	if ( !simpleschema_xyz_double) return 1;
 	return 0;
 }
 
@@ -27,6 +34,7 @@ static int
 clean_suite(void)
 {
 	pc_schema_free(simpleschema);
+	pc_schema_free(simpleschema_xyz_double);
 	return 0;
 }
 
@@ -759,6 +767,45 @@ test_patch_projective_compression_ght()
 }
 #endif	/* HAVE_LIBGHT */
 
+static void
+test_patch_spherical_to_cartesian_compression_none()
+{
+	PCPATCH *patch;
+	PCPATCH_UNCOMPRESSED *patch_uncompressed;
+	PCPOINTLIST *pl;
+	PCPOINT *pt;
+	double v;
+
+	// (2, π/4, π/4) is the point we're going to transform
+	// expected result is (1.0, 1.0, SQRT(2.0))
+
+	pl = pc_pointlist_make(1);
+	pt = pc_point_make(simpleschema_xyz_double);
+	pc_point_set_x(pt, 2.0);
+	pc_point_set_y(pt, M_PI_4);
+	pc_point_set_z(pt, M_PI_4);
+	pc_point_set_double_by_name(pt, "intensity", 9);
+	pc_pointlist_add_point(pl, pt);
+	patch_uncompressed = pc_patch_uncompressed_from_pointlist(pl);
+
+	patch = li_patch_spherical_to_cartesian((PCPATCH *)patch_uncompressed, "x", "y", "z");
+	CU_ASSERT(patch != NULL);
+	pt = pc_patch_pointn(patch, 1);
+	pc_point_get_x(pt, &v);
+	CU_ASSERT_DOUBLE_EQUAL(v, 1.0, 0.00001);
+	pc_point_get_y(pt, &v);
+	CU_ASSERT_DOUBLE_EQUAL(v, 1.0, 0.00001);
+	pc_point_get_z(pt, &v);
+	CU_ASSERT_DOUBLE_EQUAL(v, sqrt(2.0), 0.0001);
+	pc_point_get_double_by_name(pt, "intensity", &v);
+	CU_ASSERT(v == 9);
+	pc_point_free(pt);
+	pc_patch_free(patch);
+	// patch and patch_uncompressed refer to the same patch, so do not free patch_uncompressed
+
+	pc_pointlist_free(pl);
+}
+
 /* REGISTER ***********************************************************/
 
 CU_TestInfo li_patch_tests[] = {
@@ -782,6 +829,7 @@ CU_TestInfo li_patch_tests[] = {
 #ifdef HAVE_LIBGHT
 	PC_TEST(test_patch_projective_compression_ght),
 #endif
+	PC_TEST(test_patch_spherical_to_cartesian_compression_none),
 	CU_TEST_INFO_NULL
 };
 

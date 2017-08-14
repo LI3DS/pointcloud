@@ -510,6 +510,10 @@ CREATE OR REPLACE FUNCTION PC_Projective(pa pcpoint, a float8, b float8, c float
 	RETURNS pcpoint AS 'MODULE_PATHNAME', 'lipoint_projective'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION PC_SphericalToCartesian(p pcpatch, rdimname text, tdimname text, pdimname text)
+	RETURNS pcpatch AS 'MODULE_PATHNAME', 'lipatch_spherical_to_cartesian'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION PC_FrustumAsEWKB(p pcpatch)
 	RETURNS bytea AS 'MODULE_PATHNAME', 'lifrustum_from_patch_as_bytea'
 	LANGUAGE 'c' IMMUTABLE STRICT;

@@ -421,3 +421,65 @@ li_patch_projective(
 
 	return ((PCPATCH *)uncompressed_patch);
 }
+
+
+/**
+* Apply a "spherical to cartesian" transformation to a patch.
+*/
+PCPATCH *
+li_patch_spherical_to_cartesian(const PCPATCH *patch,
+		const char *rdimname, const char *tdimname, const char *pdimname)
+{
+	PCPATCH *patch_uncompressed;
+	PCDIMENSION *rdim, *tdim, *pdim;
+	PCPOINT point;
+	const PCSCHEMA *schema;
+	size_t i;
+
+	schema = patch->schema;
+
+	rdim = pc_schema_get_dimension_by_name(schema, rdimname);
+	if ( NULL == rdim)
+		return NULL;
+	tdim = pc_schema_get_dimension_by_name(schema, tdimname);
+	if ( NULL == tdim)
+		return NULL;
+	pdim = pc_schema_get_dimension_by_name(schema, pdimname);
+	if ( NULL == pdim)
+		return NULL;
+
+	patch_uncompressed = pc_patch_uncompress(patch);
+
+	point.schema = schema;
+	point.readonly = PC_TRUE;
+	point.data = ((PCPATCH_UNCOMPRESSED *)patch_uncompressed)->data;
+
+	for ( i = 0; i < patch_uncompressed->npoints ; i++ )
+	{
+		double r, t, p, x, y, z;
+		double cosp, sinp, rcosp, rsinp, cost, sint;
+
+		pc_point_get_double(&point, rdim, &r);  // r
+		pc_point_get_double(&point, tdim, &t);  // Θ
+		pc_point_get_double(&point, pdim, &p);  // Φ
+
+		cosp = cos(p);     // cos(Φ)
+		sinp = sin(p);     // sin(Φ)
+		rcosp = r * cosp;  // r * cos(Φ)
+		rsinp = r * sinp;  // r * sin(Φ)
+		cost = cos(t);     // cos(Θ)
+		sint = sin(t);     // sin(Θ)
+
+		x = rsinp * cost;
+		y = rsinp * sint;
+		z = rcosp;
+
+		pc_point_set_double(&point, rdim, x);
+		pc_point_set_double(&point, tdim, y);
+		pc_point_set_double(&point, pdim, z);
+
+		point.data += schema->size;
+	}
+
+	return patch_uncompressed;
+}
