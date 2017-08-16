@@ -526,7 +526,7 @@ CREATE OR REPLACE FUNCTION PC_Affine(p pcpoint, mat43 float8[12], xdimname text 
 	RETURNS pcpoint AS $$ SELECT PC_Affine(p, mat43[1], mat43[2], mat43[3], mat43[5], mat43[6], mat43[7], mat43[9], mat43[10], mat43[11], mat43[4], mat43[8], mat43[12], xdimname, ydimname, zdimname) $$
 	LANGUAGE 'sql' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION PC_Projective(pa pcpatch, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, j float8, k float8, l float8, m float8, n float8, o float8, p float8, xdimname text, ydimname text, zdimname text)
+CREATE OR REPLACE FUNCTION PC_Projective(pa pcpatch, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, j float8, k float8, l float8, m float8, n float8, o float8, p float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
 	RETURNS pcpatch AS 'MODULE_PATHNAME', 'lipatch_projective'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
@@ -534,7 +534,7 @@ CREATE OR REPLACE FUNCTION PC_Projective(pa pcpatch, mat44 float8[16], xdimname 
 	RETURNS pcpatch AS $$ SELECT PC_Projective(pa, mat44[1], mat44[2], mat44[3], mat44[4], mat44[5], mat44[6], mat44[7], mat44[8], mat44[9], mat44[10], mat44[11], mat44[12], mat44[13], mat44[14], mat44[15], mat44[16], xdimname, ydimname, zdimname) $$
 	LANGUAGE 'sql' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION PC_Projective(pa pcpoint, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, j float8, k float8, l float8, m float8, n float8, o float8, p float8, xdimname text, ydimname text, zdimname text)
+CREATE OR REPLACE FUNCTION PC_Projective(pa pcpoint, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, j float8, k float8, l float8, m float8, n float8, o float8, p float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
 	RETURNS pcpoint AS 'MODULE_PATHNAME', 'lipoint_projective'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
