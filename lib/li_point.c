@@ -25,7 +25,7 @@ li_point_rotate_quaternion(
 
 	schema = point->schema;
 
-	if ( xdimname )
+	if ( *xdimname != '\0' )
 	{
 		xdim = pc_schema_get_dimension_by_name(schema, xdimname);
 	}
@@ -34,7 +34,7 @@ li_point_rotate_quaternion(
 		assert(schema->xdim);
 		xdim = schema->xdim;
 	}
-	if ( ydimname )
+	if ( *ydimname != '\0' )
 	{
 		ydim = pc_schema_get_dimension_by_name(schema, ydimname);
 	}
@@ -43,7 +43,7 @@ li_point_rotate_quaternion(
 		assert(schema->ydim);
 		ydim = schema->ydim;
 	}
-	if ( zdimname )
+	if ( *zdimname != '\0' )
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}
@@ -85,7 +85,7 @@ li_point_translate(
 
 	schema = point->schema;
 
-	if ( xdimname )
+	if ( *xdimname != '\0' )
 	{
 		xdim = pc_schema_get_dimension_by_name(schema, xdimname);
 	}
@@ -94,7 +94,7 @@ li_point_translate(
 		assert(schema->xdim);
 		xdim = schema->xdim;
 	}
-	if ( ydimname )
+	if ( *ydimname != '\0' )
 	{
 		ydim = pc_schema_get_dimension_by_name(schema, ydimname);
 	}
@@ -103,7 +103,7 @@ li_point_translate(
 		assert(schema->ydim);
 		ydim = schema->ydim;
 	}
-	if ( zdimname )
+	if ( *zdimname != '\0' )
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}
@@ -148,7 +148,7 @@ li_point_affine(
 
 	schema = point->schema;
 
-	if ( xdimname )
+	if ( *xdimname != '\0' )
 	{
 		xdim = pc_schema_get_dimension_by_name(schema, xdimname);
 	}
@@ -157,7 +157,7 @@ li_point_affine(
 		assert(schema->xdim);
 		xdim = schema->xdim;
 	}
-	if ( ydimname )
+	if ( *ydimname != '\0' )
 	{
 		ydim = pc_schema_get_dimension_by_name(schema, ydimname);
 	}
@@ -166,7 +166,7 @@ li_point_affine(
 		assert(schema->ydim);
 		ydim = schema->ydim;
 	}
-	if ( zdimname )
+	if ( *zdimname != '\0' )
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}
@@ -213,7 +213,7 @@ li_point_projective(
 
 	schema = point->schema;
 
-	if ( xdimname )
+	if ( *xdimname != '\0' )
 	{
 		xdim = pc_schema_get_dimension_by_name(schema, xdimname);
 	}
@@ -222,7 +222,7 @@ li_point_projective(
 		assert(schema->xdim);
 		xdim = schema->xdim;
 	}
-	if ( ydimname )
+	if ( *ydimname != '\0' )
 	{
 		ydim = pc_schema_get_dimension_by_name(schema, ydimname);
 	}
@@ -231,7 +231,7 @@ li_point_projective(
 		assert(schema->ydim);
 		ydim = schema->ydim;
 	}
-	if ( zdimname )
+	if ( *zdimname != '\0' )
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}
