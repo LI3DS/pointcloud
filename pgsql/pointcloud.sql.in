@@ -482,6 +482,10 @@ CREATE OR REPLACE FUNCTION PC_RotateQuaternion(p pcpatch, qw float8, qx float8, 
 	RETURNS pcpatch AS 'MODULE_PATHNAME', 'lipatch_rotate_quaternion'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION PC_RotateQuaternion(p pcpatch, quat float8[4], xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
+	RETURNS pcpatch AS $$ SELECT PC_RotateQuaternion(p, quat[1], quat[2], quat[3], quat[4], xdimname, ydimname, zdimname) $$
+	LANGUAGE 'sql' IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION PC_RotateQuaternion(p pcpoint, qw float8, qx float8, qy float8, qz float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
 	RETURNS pcpoint AS 'MODULE_PATHNAME', 'lipoint_rotate_quaternion'
 	LANGUAGE 'c' IMMUTABLE STRICT;
