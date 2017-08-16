@@ -514,6 +514,10 @@ CREATE OR REPLACE FUNCTION PC_Affine(p pcpatch, a float8, b float8, c float8, d 
 	RETURNS pcpatch AS 'MODULE_PATHNAME', 'lipatch_affine'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION PC_Affine(p pcpatch, mat43 float8[12], xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
+	RETURNS pcpatch AS $$ SELECT PC_Affine(p, mat43[1], mat43[2], mat43[3], mat43[5], mat43[6], mat43[7], mat43[9], mat43[10], mat43[11], mat43[4], mat43[8], mat43[12], xdimname, ydimname, zdimname) $$
+	LANGUAGE 'sql' IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION PC_Affine(p pcpoint, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, xoff float8, yoff float8, zoff float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
 	RETURNS pcpoint AS 'MODULE_PATHNAME', 'lipoint_affine'
 	LANGUAGE 'c' IMMUTABLE STRICT;
