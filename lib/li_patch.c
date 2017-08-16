@@ -42,7 +42,7 @@ li_patch_rotate_quaternion(
 
 	schema = uncompressed_patch->schema;
 
-	if ( xdimname )
+	if ( *xdimname != '\0' )
 	{
 		xdim = pc_schema_get_dimension_by_name(schema, xdimname);
 	}
@@ -51,7 +51,7 @@ li_patch_rotate_quaternion(
 		assert(schema->xdim);
 		xdim = schema->xdim;
 	}
-	if ( ydimname )
+	if ( *ydimname != '\0' )
 	{
 		ydim = pc_schema_get_dimension_by_name(schema, ydimname);
 	}
@@ -60,7 +60,7 @@ li_patch_rotate_quaternion(
 		assert(schema->ydim);
 		ydim = schema->ydim;
 	}
-	if ( zdimname )
+	if ( *zdimname != '\0' )
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}
@@ -143,7 +143,7 @@ li_patch_translate(
 
 	schema = uncompressed_patch->schema;
 
-	if ( xdimname )
+	if ( *xdimname != '\0' )
 	{
 		xdim = pc_schema_get_dimension_by_name(schema, xdimname);
 	}
@@ -152,7 +152,7 @@ li_patch_translate(
 		assert(schema->xdim);
 		xdim = schema->xdim;
 	}
-	if ( ydimname )
+	if ( *ydimname != '\0')
 	{
 		ydim = pc_schema_get_dimension_by_name(schema, ydimname);
 	}
@@ -161,7 +161,7 @@ li_patch_translate(
 		assert(schema->ydim);
 		ydim = schema->ydim;
 	}
-	if ( zdimname )
+	if ( *zdimname != '\0')
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}
@@ -247,7 +247,7 @@ li_patch_affine(
 
 	schema = uncompressed_patch->schema;
 
-	if ( xdimname )
+	if ( *xdimname != '\0' )
 	{
 		xdim = pc_schema_get_dimension_by_name(schema, xdimname);
 	}
@@ -256,7 +256,7 @@ li_patch_affine(
 		assert(schema->xdim);
 		xdim = schema->xdim;
 	}
-	if ( ydimname )
+	if ( *ydimname != '\0' )
 	{
 		ydim = pc_schema_get_dimension_by_name(schema, ydimname);
 	}
@@ -265,7 +265,7 @@ li_patch_affine(
 		assert(schema->ydim);
 		ydim = schema->ydim;
 	}
-	if ( zdimname )
+	if ( *zdimname != '\0' )
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}
@@ -353,7 +353,7 @@ li_patch_projective(
 
 	schema = uncompressed_patch->schema;
 
-	if ( xdimname )
+	if ( *xdimname != '\0')
 	{
 		xdim = pc_schema_get_dimension_by_name(schema, xdimname);
 	}
@@ -362,7 +362,7 @@ li_patch_projective(
 		assert(schema->xdim);
 		xdim = schema->xdim;
 	}
-	if ( ydimname )
+	if ( *ydimname != '\0' )
 	{
 		ydim = pc_schema_get_dimension_by_name(schema, ydimname);
 	}
@@ -371,7 +371,7 @@ li_patch_projective(
 		assert(schema->ydim);
 		ydim = schema->ydim;
 	}
-	if ( zdimname )
+	if ( *zdimname != '\0' )
 	{
 		zdim = pc_schema_get_dimension_by_name(schema, zdimname);
 	}

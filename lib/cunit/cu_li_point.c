@@ -57,7 +57,7 @@ test_point_rotate_quaternion()
 	qx = sin(angle / 2.);
 	qy = 0;
 	qz = 0;
-	li_point_rotate_quaternion(pt, qw, qx, qy, qz, NULL, NULL, NULL);
+	li_point_rotate_quaternion(pt, qw, qx, qy, qz, "", "", "");
 	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == 1);
 	pc_point_get_y(pt, &v);
@@ -77,7 +77,7 @@ test_point_rotate_quaternion()
 	qx = 0;
 	qy = sin(angle / 2.);
 	qz = 0;
-	li_point_rotate_quaternion(pt, qw, qx, qy, qz, NULL, NULL, NULL);
+	li_point_rotate_quaternion(pt, qw, qx, qy, qz, "", "", "");
 	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == 1);
 	pc_point_get_y(pt, &v);
@@ -97,7 +97,7 @@ test_point_rotate_quaternion()
 	qx = 0;
 	qy = 0;
 	qz = sin(angle / 2.);
-	li_point_rotate_quaternion(pt, qw, qx, qy, qz, NULL, NULL, NULL);
+	li_point_rotate_quaternion(pt, qw, qx, qy, qz, "", "", "");
 	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == -1);
 	pc_point_get_y(pt, &v);
@@ -155,7 +155,7 @@ test_point_translate()
 	tx = -1.0;
 	ty = 1.0;
 	tz = 2.0;
-	li_point_translate(pt, tx, ty, tz, NULL, NULL, NULL);
+	li_point_translate(pt, tx, ty, tz, "", "", "");
 	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == 0);
 	pc_point_get_y(pt, &v);
@@ -222,7 +222,7 @@ test_point_affine()
 	li_point_affine(
 			pt,
 			a, b, c, d, e, f, g, h, i, xoff, yoff, zoff,
-			NULL, NULL, NULL);
+			"", "", "");
 	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == 3);
 	pc_point_get_y(pt, &v);
@@ -290,7 +290,7 @@ test_point_projective()
 			0, 1, 0, 0,
 			0, 0, 1, 0,
 			0, 0, 1, 0,
-			NULL, NULL, NULL);
+			"", "", "");
 	pc_point_get_x(pt, &v);
 	CU_ASSERT(v == -0.5);
 	pc_point_get_y(pt, &v);

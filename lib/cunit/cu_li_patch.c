@@ -69,7 +69,7 @@ test_patch_rotate_quaternion_compression_none()
 	qy = 0;
 	qz = 0;
 	patch = li_patch_rotate_quaternion(
-			(PCPATCH *)patch_uncompressed, qw, qx, qy, qz, NULL, NULL, NULL);
+			(PCPATCH *)patch_uncompressed, qw, qx, qy, qz, "", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
@@ -96,7 +96,7 @@ test_patch_rotate_quaternion_compression_none()
 	qy = sin(angle / 2.);
 	qz = 0;
 	patch = li_patch_rotate_quaternion(
-			(PCPATCH *)patch_uncompressed, qw, qx, qy, qz, NULL, NULL, NULL);
+			(PCPATCH *)patch_uncompressed, qw, qx, qy, qz, "", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
@@ -123,7 +123,7 @@ test_patch_rotate_quaternion_compression_none()
 	qy = 0;
 	qz = sin(angle / 2.);
 	patch = li_patch_rotate_quaternion(
-			(PCPATCH *)patch_uncompressed, qw, qx, qy, qz, NULL, NULL, NULL);
+			(PCPATCH *)patch_uncompressed, qw, qx, qy, qz, "", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
@@ -226,7 +226,7 @@ test_patch_rotate_quaternion_compression_ght()
 	qy = 0;
 	qz = 0;
 	patch = li_patch_rotate_quaternion(
-			(PCPATCH *)patch_ght, qw, qx, qy, qz, NULL, NULL, NULL);
+			(PCPATCH *)patch_ght, qw, qx, qy, qz, "", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
@@ -253,7 +253,7 @@ test_patch_rotate_quaternion_compression_ght()
 	qy = sin(angle / 2.);
 	qz = 0;
 	patch = li_patch_rotate_quaternion(
-			(PCPATCH *)patch_ght, qw, qx, qy, qz, NULL, NULL, NULL);
+			(PCPATCH *)patch_ght, qw, qx, qy, qz, "", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
@@ -280,7 +280,7 @@ test_patch_rotate_quaternion_compression_ght()
 	qy = 0;
 	qz = sin(angle / 2.);
 	patch = li_patch_rotate_quaternion(
-			(PCPATCH *)patch_ght, qw, qx, qy, qz, NULL, NULL, NULL);
+			(PCPATCH *)patch_ght, qw, qx, qy, qz, "", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
@@ -327,7 +327,7 @@ test_patch_translate_compression_none()
 	ty = 1.0;
 	tz = 2.0;
 	patch = li_patch_translate(
-			(PCPATCH *)patch_uncompressed, tx, ty, tz, NULL, NULL, NULL);
+			(PCPATCH *)patch_uncompressed, tx, ty, tz, "", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
@@ -423,7 +423,7 @@ test_patch_translate_compression_ght()
 	ty = 1.0;
 	tz = 2.0;
 	patch = li_patch_translate(
-			(PCPATCH *)patch_ght, tx, ty, tz, NULL, NULL, NULL);
+			(PCPATCH *)patch_ght, tx, ty, tz, "", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
@@ -481,7 +481,7 @@ test_patch_affine_compression_none()
 	patch = li_patch_affine(
 			(PCPATCH *)patch_uncompressed,
 			a, b, c, d, e, f, g, h, i, xoff, yoff, zoff,
-			NULL, NULL, NULL);
+			"", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
@@ -599,7 +599,7 @@ test_patch_affine_compression_ght()
 	patch = li_patch_affine(
 			(PCPATCH *)patch_ght,
 			a, b, c, d, e, f, g, h, i, xoff, yoff, zoff,
-			NULL, NULL, NULL);
+			"", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
@@ -647,7 +647,7 @@ test_patch_projective_compression_none()
 			0, 1, 0, 0,
 			0, 0, 1, 0,
 			0, 0, 1, 0,
-			NULL, NULL, NULL);
+			"", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
@@ -745,7 +745,7 @@ test_patch_projective_compression_ght()
 			0, 1, 0, 0,
 			0, 0, 1, 0,
 			0, 0, 1, 0,
-			NULL, NULL, NULL);
+			"", "", "");
 	CU_ASSERT(patch != NULL);
 	pt = pc_patch_pointn(patch, 1);
 	CU_ASSERT(pt != NULL);
