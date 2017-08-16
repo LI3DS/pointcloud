@@ -21,27 +21,27 @@ Datum libox4d_in(PG_FUNCTION_ARGS)
 	LIBOX4 *box = palloc(sizeof(LIBOX4));
 	memset(*box, 0, sizeof(LIBOX4));
 
-	if (strstr(str, "BOX4D(") !=  str )
+	if ( strstr(str, "BOX4D(") != str )
 	{
 		pfree(box);
 		elog(ERROR,"BOX4D parser - doesn't start with BOX4D(");
 		PG_RETURN_NULL();
 	}
 
-	nitems = sscanf(str,"BOX4D(%le %le %le %le ,%le %le %le %le)",
+	nitems = sscanf(str, "BOX4D(%le %le %le %le ,%le %le %le %le)",
 					&((*box)[0][0]), &((*box)[0][1]), &((*box)[0][2]), &((*box)[0][3]),
 					&((*box)[1][0]), &((*box)[1][1]), &((*box)[1][2]), &((*box)[1][3]));
-	if (nitems != 8 )
+	if ( nitems != 8 )
 	{
-		nitems = sscanf(str,"BOX4D(%le %le %le ,%le %le %le)",
+		nitems = sscanf(str, "BOX4D(%le %le %le ,%le %le %le)",
 						&((*box)[0][0]), &((*box)[0][1]), &((*box)[0][2]),
 						&((*box)[1][0]), &((*box)[1][1]), &((*box)[1][2]));
-		if (nitems != 6)
+		if ( nitems != 6 )
 		{
-			nitems = sscanf(str,"BOX4D(%le %le ,%le %le)",
+			nitems = sscanf(str, "BOX4D(%le %le ,%le %le)",
 							&((*box)[0][0]), &((*box)[0][1]),
 							&((*box)[1][0]), &((*box)[1][1]));
-			if ( nitems != 4)
+			if ( nitems != 4 )
 			{
 				pfree(box);
 				elog(ERROR, "BOX4D parser - couldn't parse");
@@ -50,25 +50,25 @@ Datum libox4d_in(PG_FUNCTION_ARGS)
 		}
 	}
 
-	if ((*box)[0][0] > (*box)[1][0])
+	if ( (*box)[0][0] > (*box)[1][0] )
 	{
 		float tmp = (*box)[0][0];
 		(*box)[0][0] = (*box)[1][0];
 		(*box)[1][0] = tmp;
 	}
-	if ((*box)[0][1] > (*box)[1][1])
+	if ( (*box)[0][1] > (*box)[1][1] )
 	{
 		float tmp = (*box)[0][1];
 		(*box)[0][1] = (*box)[1][1];
 		(*box)[1][1] = tmp;
 	}
-	if ((*box)[0][2] > (*box)[1][2])
+	if ( (*box)[0][2] > (*box)[1][2] )
 	{
 		float tmp = (*box)[0][2];
 		(*box)[0][2] = (*box)[1][2];
 		(*box)[1][2] = tmp;
 	}
-	if ((*box)[0][3] > (*box)[1][3])
+	if ( (*box)[0][3] > (*box)[1][3] )
 	{
 		float tmp = (*box)[0][3];
 		(*box)[0][3] = (*box)[1][3];
