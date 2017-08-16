@@ -136,7 +136,7 @@ Datum lipatch_translate(PG_FUNCTION_ARGS)
 		patch_in, tx, ty, tz, xdimname, ydimname, zdimname);
 	if ( ! patch_out )
 	{
-		elog(ERROR, "failed to rotate patch");
+		elog(ERROR, "failed to translate patch");
 		PG_RETURN_NULL();
 	}
 
