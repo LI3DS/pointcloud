@@ -45,6 +45,9 @@ set ( LI_HEADERS
         li_api_internal.h
         )
 
+include_directories(${LIBXML2_INCLUDE_DIRS})
+include_directories(${ZLIB_INCLUDE_DIRS})
+
 add_library (libpc-static STATIC ${PC_SOURCES} ${PC_HEADERS} ${LI_SOURCES} ${LI_HEADERS})
 add_library (liblazperf-static STATIC ${LAZPERF_SOURCES})
 
@@ -64,8 +67,13 @@ set_target_properties (liblazperf-static
     COMPILE_FLAGS "-fPIC -std=c++0x"
   )
 
-target_link_libraries (libpc-static xml2)
-target_link_libraries (libpc-static z)
+# TODO: remove ${LIBXML2_INCLUDE_DIR} eventually,
+# it's deprecated since CMake 3.7.2
+target_include_directories(libpc-static PUBLIC ${LIBXML2_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIRS})
+target_include_directories(libpc-static PUBLIC ${ZLIB_INCLUDE_DIRS})
+
+target_link_libraries (libpc-static ${LIBXML2_LIBRARIES})
+target_link_libraries (libpc-static ${ZLIB_LIBRARIES})
 target_link_libraries (libpc-static m)
 if (LIBGHT_FOUND)
   target_link_libraries (libpc-static ${LIBGHT_LIBRARY})
