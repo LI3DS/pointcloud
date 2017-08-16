@@ -506,6 +506,10 @@ CREATE OR REPLACE FUNCTION PC_Translate(p pcpoint, tx float8, ty float8, tz floa
 	RETURNS pcpoint AS 'MODULE_PATHNAME', 'lipoint_translate'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION PC_Translate(p pcpoint, tran float8[3], xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
+	RETURNS pcpoint AS $$ SELECT PC_Translate(p, tran[1], tran[2], tran[3], xdimname, ydimname, zdimname) $$
+	LANGUAGE 'sql' IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION PC_Affine(p pcpatch, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, xoff float8, yoff float8, zoff float8, xdimname text default NULL, ydimname text default NULL, zdimname text default NULL)
 	RETURNS pcpatch AS 'MODULE_PATHNAME', 'lipatch_affine'
 	LANGUAGE 'c' IMMUTABLE STRICT;
