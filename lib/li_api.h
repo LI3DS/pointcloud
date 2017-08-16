@@ -63,6 +63,9 @@ PCPATCH *li_patch_affine(const PCPATCH *patch, double a, double b, double c, dou
 /** apply a projective transformation to a patch */
 PCPATCH *li_patch_projective(const PCPATCH *patch, double a, double b, double c, double d, double e, double f, double g, double h, double i, double j, double k, double l, double m, double n, double o, double p, const char *xdimname, const char *ydimname, const char *zdimname);
 
+/** apply a "spherical to cartesian" transformation to a patch */
+PCPATCH * li_patch_spherical_to_cartesian(const PCPATCH *patch, const char *rdimname, const char *tdimname, const char *pdimname);
+
 /**********************************************************************
 * LIBOX4
 */

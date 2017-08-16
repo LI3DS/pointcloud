@@ -17,6 +17,7 @@ Datum lipatch_rotate_quaternion(PG_FUNCTION_ARGS);
 Datum lipatch_translate(PG_FUNCTION_ARGS);
 Datum lipatch_affine(PG_FUNCTION_ARGS);
 Datum lipatch_projective(PG_FUNCTION_ARGS);
+Datum lipatch_spherical_to_cartesian(PG_FUNCTION_ARGS);
 Datum lipoint_rotate_quaternion(PG_FUNCTION_ARGS);
 Datum lipoint_translate(PG_FUNCTION_ARGS);
 Datum lipoint_affine(PG_FUNCTION_ARGS);
@@ -276,6 +277,48 @@ Datum lipatch_projective(PG_FUNCTION_ARGS)
 
 	pc_patch_free(patch_in);
 	pc_patch_free(patch_out);
+
+	PG_RETURN_POINTER(serpatch);
+}
+
+PG_FUNCTION_INFO_V1(lipatch_spherical_to_cartesian);
+Datum lipatch_spherical_to_cartesian(PG_FUNCTION_ARGS)
+{
+	SERIALIZED_PATCH *serpatch;
+	PCPATCH *patch_in, *patch_out;
+	char *rdimname, *tdimname, *pdimname;  // (r, Θ, Φ)
+	PCSCHEMA *schema;
+
+	if ( PG_ARGISNULL(0) )
+		PG_RETURN_NULL();  /* returns null if no input values */
+
+	serpatch = PG_GETARG_SERPATCH_P(0);
+	rdimname = text_to_cstring(PG_GETARG_TEXT_P(1));
+	tdimname = text_to_cstring(PG_GETARG_TEXT_P(2));
+	pdimname = text_to_cstring(PG_GETARG_TEXT_P(3));
+
+	schema = pc_schema_from_pcid(serpatch->pcid, fcinfo);
+
+	patch_in = pc_patch_deserialize(serpatch, schema);
+	if ( ! patch_in )
+	{
+		elog(ERROR, "failed to deserialize patch");
+		PG_RETURN_NULL();
+	}
+
+	patch_out = li_patch_spherical_to_cartesian(patch_in, rdimname, tdimname, pdimname);
+	if ( ! patch_out )
+	{
+		elog(ERROR, "failed to transform patch");
+		PG_RETURN_NULL();
+	}
+
+	serpatch = pc_patch_serialize(patch_out, NULL);
+
+	pc_patch_free(patch_in);
+
+	if ( patch_out != patch_in )
+		pc_patch_free(patch_out);
 
 	PG_RETURN_POINTER(serpatch);
 }
