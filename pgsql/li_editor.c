@@ -22,6 +22,8 @@ Datum lipoint_rotate_quaternion(PG_FUNCTION_ARGS);
 Datum lipoint_translate(PG_FUNCTION_ARGS);
 Datum lipoint_affine(PG_FUNCTION_ARGS);
 Datum lipoint_projective(PG_FUNCTION_ARGS);
+Datum libox4d_undistort_poly_radial(PG_FUNCTION_ARGS);
+Datum libox4d_distort_poly_radial(PG_FUNCTION_ARGS);
 
 static float8* li_getarg_float8_array(FunctionCallInfoData *fcinfo, int pos, int num_elts)
 {
@@ -594,6 +596,116 @@ Datum libox4d_affine_quat(PG_FUNCTION_ARGS)
 	{
 		(*obox)[0][d] += vec[d];
 		(*obox)[1][d] += vec[d];
+	}
+
+	PG_RETURN_POINTER(obox);
+}
+
+/**
+* Undistort a box using distortion polynom.
+* PC_UndistortPolyRadial5(box libox4d, pps float8[2], c float8[2]) returns libox4d
+* PC_UndistortPolyRadial7(box libox4d, pps float8[2], c float8[3]) returns libox4d
+*/
+PG_FUNCTION_INFO_V1(libox4d_undistort_poly_radial);
+Datum libox4d_undistort_poly_radial(PG_FUNCTION_ARGS)
+{
+	int c_len;
+	int radial_type;
+	LIBOX4 *ibox, *obox;
+	float8 *pps, *c;
+	float8 c0, c1, c2;
+
+	if ( PG_ARGISNULL(0) )
+		PG_RETURN_NULL();	/* returns null if no input values */
+
+	radial_type = PG_GETARG_INT32(3);
+	switch ( radial_type )
+	{
+		case 5:
+			c_len = 2;
+			break;
+		case 7:
+			c_len = 3;
+			break;
+		default:
+			elog(ERROR, "radial type must be 3, 5 or 7");
+			PG_RETURN_NULL();
+	}
+
+	ibox = (LIBOX4 *) PG_GETARG_POINTER(0);
+
+	pps = li_getarg_float8_array(fcinfo, 1, 2);
+	if ( ! pps )
+		PG_RETURN_NULL();
+
+	c = li_getarg_float8_array(fcinfo, 2, c_len);
+	if ( ! c )
+		PG_RETURN_NULL();
+
+	c0 = c[0];
+	c1 = c[1];
+	c2 = c_len == 3 ? c[2] : 0;
+
+	obox = li_box4d_undistort(*ibox, pps[0], pps[1], c0, c1, c2);
+	if ( ! obox )
+	{
+		elog(ERROR, "internal error in libox4d_undistort_poly_radial");
+		PG_RETURN_NULL();
+	}
+
+	PG_RETURN_POINTER(obox);
+}
+
+/**
+* Distort a box using distortion polynom.
+* PC_DistortPolyRadial5(box libox4d, pps float8[2], c float8[2]) returns libox4d
+* PC_DistortPolyRadial7(box libox4d, pps float8[2], c float8[3]) returns libox4d
+*/
+PG_FUNCTION_INFO_V1(libox4d_distort_poly_radial);
+Datum libox4d_distort_poly_radial(PG_FUNCTION_ARGS)
+{
+	int c_len;
+	int radial_type;
+	LIBOX4 *ibox, *obox;
+	float8 *pps, *c;
+	float8 c0, c1, c2;
+
+	if ( PG_ARGISNULL(0) )
+		PG_RETURN_NULL();	/* returns null if no input values */
+
+	radial_type = PG_GETARG_INT32(3);
+	switch ( radial_type )
+	{
+		case 5:
+			c_len = 2;
+			break;
+		case 7:
+			c_len = 3;
+			break;
+		default:
+			elog(ERROR, "radial type must be 3, 5 or 7");
+			PG_RETURN_NULL();
+	}
+
+	ibox = (LIBOX4 *) PG_GETARG_POINTER(0);
+
+	pps = li_getarg_float8_array(fcinfo, 1, 2);
+	if ( ! pps )
+		PG_RETURN_NULL();
+
+	c = li_getarg_float8_array(fcinfo, 2, c_len);
+	if ( ! c )
+		PG_RETURN_NULL();
+
+	c0 = c[0];
+	c1 = c[1];
+	c2 = c_len == 3 ? c[2] : 0;
+
+	obox = li_box4d_distort(*ibox, pps[0], pps[1], c0, c1, c2);
+	if ( ! obox )
+	{
+		elog(ERROR, "internal error in libox4d_distort_poly_radial");
+		PG_RETURN_NULL();
 	}
 
 	PG_RETURN_POINTER(obox);

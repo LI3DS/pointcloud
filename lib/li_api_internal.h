@@ -25,6 +25,9 @@ void li_matrix_44_multiply_vector_4(LIVEC4 res, const LIMAT44 mat, const LIVEC4 
 double li_matrix_44_determinant(const LIMAT44 m);
 void li_matrix_44_adjugate(LIMAT44 res, const LIMAT44 m, double *determinant);
 int li_matrix_44_inverse(LIMAT44 res, const LIMAT44 m);
+void li_distortion_set(LIDISTORSION*, double, double, double, double, double);
+int li_box_transform_distorsion(LIBOX3, const LIDISTORSION*, const LIBOX3);
+int li_box_transform_undistorsion(LIBOX3, const LIDISTORSION*, const LIBOX3);
 
 void li_matrix_44_warn(const char *func, int line, const char *name, const LIMAT44 m);
 void li_vector_3_warn(const char *func, int line, const char *name, const LIVEC4 v);

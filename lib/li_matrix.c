@@ -660,18 +660,30 @@ li_frustum_spherical_from_cartesian(LIFRUSTUM *res, const LIFRUSTUM *f)
 }
 
 
+void
+li_distortion_set(LIDISTORSION* dist, double pps0, double pps1, double c0, double c1, double c2)
+{
+	// FIXME: compte r2max when not provided
+	// see https://github.com/IGNF/libOri/blob/e5b0234/src/DistortionPolynom.cpp#L11-L84
+	dist->pps[0] = pps0;
+	dist->pps[1] = pps1;
+	dist->c[0] = c0;
+	dist->c[1] = c1;
+	dist->c[2] = c2;
+	dist->r2max = 0;
+}
+
 /**
 * Distorsion polynom : r3,r5,r7
 * https://github.com/IGNF/libOri/blob/master/src/DistortionPolynom.cpp
 */
-
 int
 li_vector_3_distorsion(LIVEC3 res, const LIDISTORSION *d, const LIVEC3 vec)
 {
 	double v[] = { res[0]-d->pps[0], res[0]-d->pps[1] };
 	double r2 = v[0]*v[0]+v[1]*v[1];
 	double dr;
-	if(r2>d->r2max)
+	if ( d->r2max > 0 && r2 > d->r2max )
 		return PC_FAILURE;
 
 	dr = r2*(d->c[0] + r2*(d->c[1] + r2*d->c[2]));
@@ -724,7 +736,7 @@ li_box_transform_distorsion(LIBOX3 res, const LIDISTORSION *d, const LIBOX3 b)
 	}
 	for( i = 0; i < 4; ++i )
 	{
-		if(r2c[i] > d->r2max)
+		if ( d->r2max > 0 && r2c[i] > d->r2max )
 			return PC_FAILURE;
 
 		Pe[i] = fmax(Pc[i],Pc[(i+1)%4]);
@@ -787,7 +799,7 @@ li_vector_3_undistorsion(LIVEC3 res, const LIDISTORSION *d, const LIVEC3 vec)
 		double t2 = t *t;
 		double R_, R  = -1+t+t*t2*(c3+t2*(c5+t2*c7));
 
-		if(R*R*r2<LIUNDISTORSION_ERR2MAX && t2*r2<d->r2max)
+		if ( R*R*r2<LIUNDISTORSION_ERR2MAX && (d->r2max <= 0 || t2*r2 < d->r2max))
 		{
 			res[0] = d->pps[0] + t * v[0];
 			res[1] = d->pps[1] + t * v[1];

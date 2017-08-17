@@ -73,6 +73,10 @@ LIBOX4 *li_box4d_affine(LIBOX4 ibox, double a, double b, double c, double d, dou
 
 LIBOX4 *li_box4d_rotate_quaternion(LIBOX4 ibox, double qw, double qx, double qy, double qz);
 
+LIBOX4 *li_box4d_distort(LIBOX4 ibox, double pps0, double pps1, double c0, double c1, double c2);
+
+LIBOX4 *li_box4d_undistort(LIBOX4 ibox, double pps0, double pps1, double c0, double c1, double c2);
+
 /** convert a box to a frustum (lossless) */
 int li_frustum_from_box(LIFRUSTUM *res, const LIBOX3 b);
 
