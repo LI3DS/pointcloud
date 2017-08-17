@@ -550,7 +550,7 @@ CREATE OR REPLACE FUNCTION PC_Projective(pt pcpoint, mat44 float8[16], xdimname 
 	RETURNS pcpoint AS $$ SELECT PC_Projective(pt, mat44[1], mat44[2], mat44[3], mat44[4], mat44[5], mat44[6], mat44[7], mat44[8], mat44[9], mat44[10], mat44[11], mat44[12], mat44[13], mat44[14], mat44[15], mat44[16], xdimname, ydimname, zdimname) $$
 	LANGUAGE 'sql' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION PC_SphericalToCartesian(p pcpatch, rdimname text, tdimname text, pdimname text)
+CREATE OR REPLACE FUNCTION PC_SphericalToCartesian(p pcpatch, rdimname text default '', tdimname text default '', pdimname text default '')
 	RETURNS pcpatch AS 'MODULE_PATHNAME', 'lipatch_spherical_to_cartesian'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
