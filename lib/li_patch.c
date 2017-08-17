@@ -438,15 +438,36 @@ li_patch_spherical_to_cartesian(const PCPATCH *patch,
 
 	schema = patch->schema;
 
-	rdim = pc_schema_get_dimension_by_name(schema, rdimname);
-	if ( NULL == rdim)
+	if ( *rdimname != '\0')
+	{
+		rdim = pc_schema_get_dimension_by_name(schema, rdimname);
+	}
+	else
+	{
+		assert(schema->xdim);
+		rdim = schema->xdim;
+	}
+	if ( *tdimname != '\0' )
+	{
+		tdim = pc_schema_get_dimension_by_name(schema, tdimname);
+	}
+	else
+	{
+		assert(schema->ydim);
+		tdim = schema->ydim;
+	}
+	if ( *pdimname != '\0' )
+	{
+		pdim = pc_schema_get_dimension_by_name(schema, pdimname);
+	}
+	else if ( schema->zdim )
+	{
+		pdim = schema->zdim;
+	}
+	else
+	{
 		return NULL;
-	tdim = pc_schema_get_dimension_by_name(schema, tdimname);
-	if ( NULL == tdim)
-		return NULL;
-	pdim = pc_schema_get_dimension_by_name(schema, pdimname);
-	if ( NULL == pdim)
-		return NULL;
+	}
 
 	patch_uncompressed = pc_patch_uncompress(patch);
 
