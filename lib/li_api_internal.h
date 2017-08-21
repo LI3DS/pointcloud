@@ -15,8 +15,9 @@
 void li_matrix_43_set(LIMAT43 mat, double a, double b, double c, double d, double e, double f, double g, double h, double i, double xoff, double yoff, double zoff);
 void li_matrix_44_set(LIMAT44 mat, double a,  double b, double c, double d, double e, double f, double g, double h, double i, double j, double k, double l, double m, double n, double o, double p);
 void li_matrix_33_set_from_quaternion(LIMAT33 mat, double qw, double qx, double qy, double qz);
-void li_matrix_33_multiply_vector_3(LIVEC3 rotatedvec, const LIMAT33 mat, const LIVEC3 vec);
-void li_matrix_43_transform_affine(LIVEC3 res, const LIMAT43 mat, const LIVEC3 vec);
+void li_matrix_44_set_from_pinhole_projection(LIMAT44 mat, double px, double py, double fx, double fy, double s);
+int li_matrix_33_multiply_vector_3(LIVEC3 rotatedvec, const LIMAT33 mat, const LIVEC3 vec);
+int li_matrix_43_transform_affine(LIVEC3 res, const LIMAT43 mat, const LIVEC3 vec);
 int li_matrix_44_transform_projective_vector_3(LIVEC3 res, const LIMAT44 mat, const LIVEC3 vec);
 void li_matrix_44_transpose(LIMAT44 res, const LIMAT44 mat);
 void li_matrix_44_multiply_matrix_44(LIMAT44 res, const LIMAT44 mat1, const LIMAT44 mat2);
