@@ -182,12 +182,13 @@ li_matrix_44_set_from_pinhole_unprojection(LIMAT44 mat,
 /**
 * Multiply mat by vec and store the resuting vector in res.
 */
-void
+int
 li_matrix_33_multiply_vector_3(LIVEC3 res, const LIMAT33 mat, const LIVEC3 vec)
 {
 	res[0] = mat[0] * vec[0] + mat[1] * vec[1] + mat[2] * vec[2];
 	res[1] = mat[3] * vec[0] + mat[4] * vec[1] + mat[5] * vec[2];
 	res[2] = mat[6] * vec[0] + mat[7] * vec[1] + mat[8] * vec[2];
+	return PC_SUCCESS;
 }
 
 /**
@@ -218,12 +219,13 @@ li_matrix_44_multiply_vector_4(LIVEC4 res, const LIMAT44 mat, const LIVEC4 vec)
 * Apply an affine transformation to the vector vec and store the resulting
 * vector in res.
 */
-void
+int
 li_matrix_43_transform_affine(LIVEC3 res, const LIMAT43 mat, const LIVEC3 vec)
 {
 	res[0] = mat[0] * vec[0] + mat[1] * vec[1] + mat[ 2] * vec[2] + mat[ 3];
 	res[1] = mat[4] * vec[0] + mat[5] * vec[1] + mat[ 6] * vec[2] + mat[ 7];
 	res[2] = mat[8] * vec[0] + mat[9] * vec[1] + mat[10] * vec[2] + mat[11];
+	return PC_SUCCESS;
 }
 
 /**

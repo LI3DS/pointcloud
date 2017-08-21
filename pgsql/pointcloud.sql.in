@@ -580,3 +580,7 @@ CREATE OR REPLACE FUNCTION PC_Affine(box libox4d, mat43 float8[12])
 CREATE OR REPLACE FUNCTION PC_Affine(box libox4d, quat float8[4], vec float8[3])
 	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_affine_quat'
 	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_ProjectivePinhole(box libox4d, focal float8, pp float8[2])
+	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_projective_pinhole'
+	LANGUAGE 'c' IMMUTABLE STRICT;

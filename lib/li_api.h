@@ -73,6 +73,8 @@ LIBOX4 *li_box4d_affine(LIBOX4 ibox, double a, double b, double c, double d, dou
 
 LIBOX4 *li_box4d_rotate_quaternion(LIBOX4 ibox, double qw, double qx, double qy, double qz);
 
+LIBOX4 *li_box4d_projective_pinhole(LIBOX4 ibox, double focal, double px, double py);
+
 /** convert a box to a frustum (lossless) */
 int li_frustum_from_box(LIFRUSTUM *res, const LIBOX3 b);
 

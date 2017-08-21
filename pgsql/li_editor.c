@@ -24,6 +24,7 @@ Datum lipoint_affine(PG_FUNCTION_ARGS);
 Datum lipoint_projective(PG_FUNCTION_ARGS);
 Datum libox4d_affine_matr(PG_FUNCTION_ARGS);
 Datum libox4d_affine_quat(PG_FUNCTION_ARGS);
+Datum libox4d_projective_pinhole(PG_FUNCTION_ARGS);
 
 static float8* li_getarg_float8_array(FunctionCallInfoData *fcinfo, int pos, int num_elts)
 {
@@ -597,6 +598,33 @@ Datum libox4d_affine_quat(PG_FUNCTION_ARGS)
 		(*obox)[0][d] += vec[d];
 		(*obox)[1][d] += vec[d];
 	}
+
+	PG_RETURN_POINTER(obox);
+}
+
+/**
+* Apply a projective pinhole transformation to a box4d.
+* PC_ProjectivePinhole(box libox4d, focal float8, pp float8[2])
+*/
+PG_FUNCTION_INFO_V1(libox4d_projective_pinhole);
+Datum libox4d_projective_pinhole(PG_FUNCTION_ARGS)
+{
+	LIBOX4 *ibox, *obox;
+	float8 focal, *pp;
+
+	if ( PG_ARGISNULL(0) )
+		PG_RETURN_NULL();  /* returns NULL if no input values */
+
+	ibox = (LIBOX4 *) PG_GETARG_POINTER(0);
+
+	focal = PG_GETARG_FLOAT8(1);
+	pp = li_getarg_float8_array(fcinfo, 2, 2);
+	if ( ! pp )
+		PG_RETURN_NULL();
+
+	obox = li_box4d_projective_pinhole(*ibox, focal, pp[0], pp[1]);
+	if ( ! obox )
+		PG_RETURN_NULL();
 
 	PG_RETURN_POINTER(obox);
 }
