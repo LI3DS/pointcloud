@@ -5,9 +5,25 @@
 
 #include "pc_api_internal.h"
 #include "li_api_internal.h"
+#include "stringbuffer.h"
 
 
 typedef int (*transform_fn_t)(LIVEC3, const double *, const LIVEC3);
+
+
+char *
+li_box4d_as_box3d(LIBOX4 box)
+{
+	stringbuffer_t *sb = stringbuffer_create();
+	char *str;
+
+	stringbuffer_aprintf(sb, "BOX3D(%g %g %g,%g %g %g)",
+						 box[0][0], box[0][1], box[0][2],
+						 box[1][0], box[1][1], box[1][2]);
+	str = stringbuffer_getstringcopy(sb);
+	stringbuffer_destroy(sb);
+	return str;
+}
 
 
 static LIBOX4 *

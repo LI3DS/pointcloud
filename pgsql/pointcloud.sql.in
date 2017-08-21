@@ -573,6 +573,10 @@ CREATE TYPE libox4d (
 	output = libox4d_out
 );
 
+CREATE OR REPLACE FUNCTION PC_AsBox3D(box libox4d)
+	RETURNS text AS 'MODULE_PATHNAME', 'libox4d_as_box3d'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION PC_Affine(box libox4d, mat43 float8[12])
 	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_affine_matr'
 	LANGUAGE 'c' IMMUTABLE STRICT;
