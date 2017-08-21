@@ -10,6 +10,7 @@
 
 Datum libox4d_in(PG_FUNCTION_ARGS);
 
+Datum libox4d_as_box3ds(PG_FUNCTION_ARGS);
 Datum lifrustum_from_patch_as_bytea(PG_FUNCTION_ARGS);
 
 
@@ -122,6 +123,20 @@ Datum libox4d_out(PG_FUNCTION_ARGS)
 			(*box)[1][0], (*box)[1][1], (*box)[1][2], (*box)[1][3]);
 
 	PG_RETURN_CSTRING(result);
+}
+
+PG_FUNCTION_INFO_V1(libox4d_as_box3d);
+Datum libox4d_as_box3d(PG_FUNCTION_ARGS)
+{
+	LIBOX4 *box = (LIBOX4 *)PG_GETARG_POINTER(0);
+	char *str;
+	text *txt;
+
+	str = li_box4d_as_box3d(*box);
+	txt = cstring_to_text(str);
+	pfree(str);
+
+	PG_RETURN_TEXT_P(txt);
 }
 
 PG_FUNCTION_INFO_V1(lifrustum_from_patch_as_bytea);

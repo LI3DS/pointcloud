@@ -69,6 +69,8 @@ PCPATCH * li_patch_spherical_to_cartesian(const PCPATCH *patch, const char *rdim
 /**********************************************************************
 * LIBOX4
 */
+char *li_box4d_as_box3d(LIBOX4 box);
+
 LIBOX4 *li_box4d_affine(LIBOX4 ibox, double a, double b, double c, double d, double e, double f, double g, double h, double i, double xoff, double yoff, double zoff);
 
 LIBOX4 *li_box4d_rotate_quaternion(LIBOX4 ibox, double qw, double qx, double qy, double qz);
