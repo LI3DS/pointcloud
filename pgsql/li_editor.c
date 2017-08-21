@@ -22,6 +22,8 @@ Datum lipoint_rotate_quaternion(PG_FUNCTION_ARGS);
 Datum lipoint_translate(PG_FUNCTION_ARGS);
 Datum lipoint_affine(PG_FUNCTION_ARGS);
 Datum lipoint_projective(PG_FUNCTION_ARGS);
+Datum libox4d_affine_matr(PG_FUNCTION_ARGS);
+Datum libox4d_affine_quat(PG_FUNCTION_ARGS);
 
 static float8* li_getarg_float8_array(FunctionCallInfoData *fcinfo, int pos, int num_elts)
 {
