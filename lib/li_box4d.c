@@ -26,6 +26,22 @@ li_box4d_as_box3d(LIBOX4 box)
 }
 
 
+double *
+li_box4d_to_double_array(LIBOX4 box)
+{
+	double *vals = pcalloc(8 * sizeof(double));
+	vals[0] = box[0][0];
+	vals[1] = box[0][1];
+	vals[2] = box[0][2];
+	vals[3] = box[0][3];
+	vals[4] = box[1][0];
+	vals[5] = box[1][1];
+	vals[6] = box[1][2];
+	vals[7] = box[1][3];
+	return vals;
+}
+
+
 static LIBOX4 *
 li_box4d_transform(LIBOX4 ibox, void *mat, transform_fn_t transform)
 {
