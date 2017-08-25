@@ -11,6 +11,7 @@
 Datum libox4d_in(PG_FUNCTION_ARGS);
 
 Datum libox4d_as_box3ds(PG_FUNCTION_ARGS);
+Datum libox4d_as_array(PG_FUNCTION_ARGS);
 Datum lifrustum_from_patch_as_bytea(PG_FUNCTION_ARGS);
 
 
@@ -137,6 +138,27 @@ Datum libox4d_as_box3d(PG_FUNCTION_ARGS)
 	pfree(str);
 
 	PG_RETURN_TEXT_P(txt);
+}
+
+PG_FUNCTION_INFO_V1(libox4d_as_array);
+Datum libox4d_as_array(PG_FUNCTION_ARGS)
+{
+	LIBOX4 *box = (LIBOX4 *)PG_GETARG_POINTER(0);
+	ArrayType *result;
+	Datum *elems;
+	double *vals;
+	size_t i;
+	static size_t n = 8;
+
+	elems = (Datum *)palloc(n * sizeof(Datum));
+	vals = li_box4d_to_double_array(*box);
+	i = n;
+	while (i--) elems[i] = Float8GetDatum(vals[i]);
+	pcfree(vals);
+	result = construct_array(elems, n, FLOAT8OID,
+			sizeof(float8), FLOAT8PASSBYVAL, 'd');
+
+	PG_RETURN_ARRAYTYPE_P(result);
 }
 
 PG_FUNCTION_INFO_V1(lifrustum_from_patch_as_bytea);
