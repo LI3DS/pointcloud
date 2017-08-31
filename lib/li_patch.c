@@ -502,5 +502,18 @@ li_patch_spherical_to_cartesian(const PCPATCH *patch,
 		point.data += schema->size;
 	}
 
+	if ( PC_FAILURE == pc_patch_uncompressed_compute_extent(
+				(PCPATCH_UNCOMPRESSED *) patch_uncompressed) )
+	{
+		pcerror("%s: extent computation failed", __func__);
+		return NULL;
+	}
+	if ( PC_FAILURE == pc_patch_uncompressed_compute_stats(
+				(PCPATCH_UNCOMPRESSED *)patch_uncompressed) )
+	{
+		pcerror("%s: stats computation failed", __func__);
+		return NULL;
+	}
+
 	return patch_uncompressed;
 }
