@@ -491,9 +491,9 @@ li_patch_spherical_to_cartesian(const PCPATCH *patch,
 		cost = cos(t);     // cos(Θ)
 		sint = sin(t);     // sin(Θ)
 
-		x = rsinp * cost;
-		y = rsinp * sint;
-		z = rcosp;
+		x = rcosp * cost;
+		y = rcosp * sint;
+		z = rsinp;
 
 		pc_point_set_double(&point, rdim, x);
 		pc_point_set_double(&point, tdim, y);
