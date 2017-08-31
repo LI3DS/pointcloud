@@ -122,10 +122,17 @@ li_box4d_affine(
 * Apply a projective pinhole transformation to a box4d.
 */
 LIBOX4 *
-li_box4d_projective_pinhole(LIBOX4 ibox, double focal, double px, double py)
+li_box4d_projective_pinhole(LIBOX4 ibox, double focal, double px, double py, char inverse)
 {
-	LIMAT44 pmat;
+	LIMAT44 mat;
 
-	li_matrix_44_set_from_pinhole_projection(pmat, px, py, focal, focal, 0);
-	return li_box4d_transform(ibox, pmat, li_matrix_44_transform_projective_vector_3);
+	if ( inverse )
+	{
+		li_matrix_44_set_from_pinhole_unprojection(mat, px, py, focal, focal, 0);
+	}
+	else
+	{
+		li_matrix_44_set_from_pinhole_projection(mat, px, py, focal, focal, 0);
+	}
+	return li_box4d_transform(ibox, mat, li_matrix_44_transform_projective_vector_3);
 }

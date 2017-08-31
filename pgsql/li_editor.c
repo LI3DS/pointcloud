@@ -611,6 +611,7 @@ Datum libox4d_projective_pinhole(PG_FUNCTION_ARGS)
 {
 	LIBOX4 *ibox, *obox;
 	float8 focal, *pp;
+	bool inverse;
 
 	if ( PG_ARGISNULL(0) )
 		PG_RETURN_NULL();  /* returns NULL if no input values */
@@ -622,7 +623,9 @@ Datum libox4d_projective_pinhole(PG_FUNCTION_ARGS)
 	if ( ! pp )
 		PG_RETURN_NULL();
 
-	obox = li_box4d_projective_pinhole(*ibox, focal, pp[0], pp[1]);
+	inverse = PG_GETARG_BOOL(3);
+
+	obox = li_box4d_projective_pinhole(*ibox, focal, pp[0], pp[1], inverse);
 	if ( ! obox )
 		PG_RETURN_NULL();
 
