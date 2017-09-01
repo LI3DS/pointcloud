@@ -491,15 +491,28 @@ li_patch_spherical_to_cartesian(const PCPATCH *patch,
 		cost = cos(t);     // cos(Θ)
 		sint = sin(t);     // sin(Θ)
 
-		x = rsinp * cost;
-		y = rsinp * sint;
-		z = rcosp;
+		x = rcosp * cost;
+		y = rcosp * sint;
+		z = rsinp;
 
 		pc_point_set_double(&point, rdim, x);
 		pc_point_set_double(&point, tdim, y);
 		pc_point_set_double(&point, pdim, z);
 
 		point.data += schema->size;
+	}
+
+	if ( PC_FAILURE == pc_patch_uncompressed_compute_extent(
+				(PCPATCH_UNCOMPRESSED *) patch_uncompressed) )
+	{
+		pcerror("%s: extent computation failed", __func__);
+		return NULL;
+	}
+	if ( PC_FAILURE == pc_patch_uncompressed_compute_stats(
+				(PCPATCH_UNCOMPRESSED *)patch_uncompressed) )
+	{
+		pcerror("%s: stats computation failed", __func__);
+		return NULL;
 	}
 
 	return patch_uncompressed;
