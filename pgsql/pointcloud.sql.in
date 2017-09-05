@@ -522,6 +522,10 @@ CREATE OR REPLACE FUNCTION PC_Affine(p pcpatch, quat float8[4], tran float8[3], 
 	RETURNS pcpatch AS $$ SELECT PC_Translate(PC_RotateQuaternion(p, quat[1], quat[2], quat[3], quat[4], xdimname, ydimname, zdimname), tran[1], tran[2], tran[3], xdimname, ydimname, zdimname) $$
 	LANGUAGE 'sql' IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION PC_AffineInverse(p pcpatch, quat float8[4], tran float8[3], xdimname text default '', ydimname text default '', zdimname text default '')
+	RETURNS pcpatch AS $$ SELECT PC_RotateQuaternion(PC_Translate(p, -tran[1], -tran[2], -tran[3], xdimname, ydimname, zdimname), quat[1], -quat[2], -quat[3], -quat[4], xdimname, ydimname, zdimname) $$
+	LANGUAGE 'sql' IMMUTABLE STRICT;
+
 CREATE OR REPLACE FUNCTION PC_Affine(p pcpoint, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, xoff float8, yoff float8, zoff float8, xdimname text default '', ydimname text default '', zdimname text default '')
 	RETURNS pcpoint AS 'MODULE_PATHNAME', 'lipoint_affine'
 	LANGUAGE 'c' IMMUTABLE STRICT;
@@ -532,6 +536,10 @@ CREATE OR REPLACE FUNCTION PC_Affine(p pcpoint, mat43 float8[12], xdimname text 
 
 CREATE OR REPLACE FUNCTION PC_Affine(p pcpoint, quat float8[4], tran float8[3], xdimname text default '', ydimname text default '', zdimname text default '')
 	RETURNS pcpoint AS $$ SELECT PC_Translate(PC_RotateQuaternion(p, quat[1], quat[2], quat[3], quat[4], xdimname, ydimname, zdimname), tran[1], tran[2], tran[3], xdimname, ydimname, zdimname) $$
+	LANGUAGE 'sql' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_AffineInverse(p pcpoint, quat float8[4], tran float8[3], xdimname text default '', ydimname text default '', zdimname text default '')
+	RETURNS pcpoint AS $$ SELECT PC_RotateQuaternion(PC_Translate(p, -tran[1], -tran[2], -tran[3], xdimname, ydimname, zdimname), quat[1], -quat[2], -quat[3], -quat[4], xdimname, ydimname, zdimname) $$
 	LANGUAGE 'sql' IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION PC_Projective(pa pcpatch, a float8, b float8, c float8, d float8, e float8, f float8, g float8, h float8, i float8, j float8, k float8, l float8, m float8, n float8, o float8, p float8, xdimname text default '', ydimname text default '', zdimname text default '')
@@ -585,7 +593,11 @@ CREATE OR REPLACE FUNCTION PC_Affine(box libox4d, mat43 float8[12])
 	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_affine_matr'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION PC_Affine(box libox4d, quat float8[4], vec float8[3])
+CREATE OR REPLACE FUNCTION PC_Affine(box libox4d, quat float8[4], vec float8[3], inverse boolean default false)
+	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_affine_quat'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION PC_AffineInverse(box libox4d, quat float8[4], vec float8[3], inverse boolean default true)
 	RETURNS libox4d AS 'MODULE_PATHNAME', 'libox4d_affine_quat'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
