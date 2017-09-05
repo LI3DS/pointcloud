@@ -574,6 +574,7 @@ Datum libox4d_affine_quat(PG_FUNCTION_ARGS)
 	int d;
 	LIBOX4 *ibox, *obox;
 	float8 *quat, *vec;
+	bool inverse;
 
 	if ( PG_ARGISNULL(0) )
 		PG_RETURN_NULL();	/* returns null if no input values */
@@ -588,15 +589,34 @@ Datum libox4d_affine_quat(PG_FUNCTION_ARGS)
 	if ( ! vec )
 		PG_RETURN_NULL();
 
+	inverse = PG_GETARG_BOOL(3);
+
+	if ( inverse )
+	{
+		// translate
+		for ( d = 0; d < 3; d++)
+		{
+			(*ibox)[0][d] -= vec[d];
+			(*ibox)[1][d] -= vec[d];
+		}
+
+		quat[1] = -quat[1];
+		quat[2] = -quat[2];
+		quat[3] = -quat[3];
+	}
+
 	// rotate
 	obox = li_box4d_rotate_quaternion(*ibox,
 		quat[0], quat[1], quat[2], quat[3]);
 
-	// translate
-	for ( d = 0; d < 3; d++)
+	if ( ! inverse )
 	{
-		(*obox)[0][d] += vec[d];
-		(*obox)[1][d] += vec[d];
+		// translate
+		for ( d = 0; d < 3; d++)
+		{
+			(*obox)[0][d] += vec[d];
+			(*obox)[1][d] += vec[d];
+		}
 	}
 
 	PG_RETURN_POINTER(obox);
