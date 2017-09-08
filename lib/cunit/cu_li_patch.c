@@ -783,7 +783,7 @@ test_patch_spherical_to_cartesian_compression_none()
 	pt = pc_point_make(simpleschema_xyz_double);
 	pc_point_set_x(pt, 2.0);
 	pc_point_set_y(pt, M_PI_4);
-	pc_point_set_z(pt, M_PI_4);
+	pc_point_set_z(pt, -M_PI_4);
 	pc_point_set_double_by_name(pt, "intensity", 9);
 	pc_pointlist_add_point(pl, pt);
 	patch_uncompressed = pc_patch_uncompressed_from_pointlist(pl);
